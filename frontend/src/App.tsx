@@ -1,17 +1,47 @@
+import { useState } from 'react'
 import { useAccount } from 'wagmi'
 import { Header } from './components/Header'
 import { PiggyBankDashboard } from './components/PiggyBankDashboard'
+import { WalletConnectPage } from './components/WalletConnectPage'
+import { TransactionToast } from './components/TransactionToast'
+import { useWalletHistory } from './hooks/useWalletHistory'
 import './App.css'
+import './styles/walletConnect.css'
+
+type Page = 'home' | 'wallet'
 
 function App() {
   const { isConnected } = useAccount()
+  const [currentPage, setCurrentPage] = useState<Page>('home')
+
+  // Track wallet connection history
+  useWalletHistory()
 
   return (
     <div className="app">
+      <TransactionToast />
       <Header />
 
+      {/* Navigation */}
+      <nav className="app-nav">
+        <button
+          className={`nav-btn ${currentPage === 'home' ? 'active' : ''}`}
+          onClick={() => setCurrentPage('home')}
+        >
+          🏠 Home
+        </button>
+        <button
+          className={`nav-btn ${currentPage === 'wallet' ? 'active' : ''}`}
+          onClick={() => setCurrentPage('wallet')}
+        >
+          🔗 Wallet Connect
+        </button>
+      </nav>
+
       <main className="main-content">
-        {!isConnected ? (
+        {currentPage === 'wallet' ? (
+          <WalletConnectPage />
+        ) : !isConnected ? (
           <div className="connect-prompt">
             <div className="connect-card">
               <h2>Welcome to Ajo PiggyBank</h2>
