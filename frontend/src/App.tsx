@@ -1,34 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useAccount } from 'wagmi'
+import { Header } from './components/Header'
+import { PiggyBankDashboard } from './components/PiggyBankDashboard'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { isConnected } = useAccount()
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="app">
+      <Header />
+
+      <main className="main-content">
+        {!isConnected ? (
+          <div className="connect-prompt">
+            <div className="connect-card">
+              <h2>Welcome to Ajo PiggyBank</h2>
+              <p>A decentralized savings application on Base blockchain</p>
+              <div className="features">
+                <div className="feature">
+                  <span className="icon">🔒</span>
+                  <h3>Time-Locked Savings</h3>
+                  <p>Lock your ETH for a specific duration</p>
+                </div>
+                <div className="feature">
+                  <span className="icon">💰</span>
+                  <h3>Secure Storage</h3>
+                  <p>Your funds are safe on-chain</p>
+                </div>
+                <div className="feature">
+                  <span className="icon">⚡</span>
+                  <h3>Base Network</h3>
+                  <p>Fast and low-cost transactions</p>
+                </div>
+              </div>
+              <div className="connect-action">
+                <p>Connect your wallet to get started</p>
+                <appkit-button />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <PiggyBankDashboard />
+        )}
+      </main>
+
+      <footer className="footer">
+        <p>Built with REOWN AppKit & WalletConnect on Base</p>
+      </footer>
+    </div>
   )
 }
 
