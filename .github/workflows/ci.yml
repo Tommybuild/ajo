@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Run optional deploy job'
+        required: false
+        default: 'false'
+
+jobs:
+  test:
+    name: Lint, Type-check, Build (Frontend)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Lint
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Type check
+        working-directory: frontend
+        run: npm run type-check
+
+      - name: Build
+        working-directory: frontend
+        run: npm run build
+
+  foundry-tests:
+    name: Contracts Tests (Foundry) — optional if foundry.toml exists
+    runs-on: ubuntu-latest
+    if: hashFiles('foundry.toml') != ''
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Install deps (forge install)
+        run: forge install
+
+      - name: Build (forge build)
+        run: forge build
+
+      - name: Test (forge test)
+        run: forge test -vvv
+
+  deploy:
+    name: Optional Deploy (manual)
+    needs: [ test ]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy == 'true'
+    env:
+      PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+      RPC_URL: ${{ secrets.RPC_URL }}
+      EXPLORER_API_KEY: ${{ secrets.EXPLORER_API_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify required secrets
+        run: |
+          if [ -z "${PRIVATE_KEY}" ] || [ -z "${RPC_URL}" ]; then
+            echo "Missing secrets PRIVATE_KEY or RPC_URL"; exit 1; fi
+          echo "Secrets present. This repo hosts the frontend; deploy/verify typically runs in the contracts repo."
+
+      - name: Placeholder deploy step
+        run: echo "Implement deployment in the contracts repository or add your scripts here."

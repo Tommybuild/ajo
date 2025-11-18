@@ -243,6 +243,33 @@ Adapt these commands to match your actual contracts repository structure.
 
 ---
 
+## CI/CD
+
+This repository includes a GitHub Actions workflow at `.github/workflows/ci.yml` that:
+
+- Runs on pull requests and pushes to `main`.
+- Installs frontend dependencies, lints, type-checks, and builds the app.
+- Optionally runs Foundry tests if `foundry.toml` exists in the repository.
+- Provides an optional, manual `deploy` job via the "Run workflow" button.
+
+### Triggers
+
+- `pull_request`: Lint, type-check, and build run automatically for PRs.
+- `push` to `main`: Same checks run on main.
+- `workflow_dispatch`: Manual run; set input `deploy: true` to run optional deploy job.
+
+### Optional deploy job secrets
+
+Configure these repository secrets if you enable the deploy job (usually in your contracts repository):
+
+- `PRIVATE_KEY`: Deployer private key (use a test key; never commit).
+- `RPC_URL`: Network RPC endpoint (e.g., Base Sepolia).
+- `EXPLORER_API_KEY`: Block explorer API key (optional, for verification if added).
+
+Note: This repo hosts the frontend. Contract deployment/verification typically lives in the contracts repository where your Foundry project resides.
+
+---
+
 ## Security and Disclaimer
 
 - Always audit and thoroughly test smart contracts before deploying to mainnet.
