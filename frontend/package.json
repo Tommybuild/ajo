@@ -11,7 +11,10 @@
     "type-check": "tsc -b --noEmit",
     "clean": "rm -rf dist node_modules/.vite",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
-    "check-env": "node -e \"console.log('✅ Environment check passed')\" || echo '⚠️  Set up your .env file'"
+    "check-env": "node -e \"console.log('✅ Environment check passed')\" || echo '⚠️  Set up your .env file'",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
   },
   "dependencies": {
     "@reown/appkit": "^1.8.14",
@@ -25,19 +28,25 @@
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@tailwindcss/postcss": "^4.1.17",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^24.10.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@vitejs/plugin-react": "^5.1.0",
+    "@vitest/ui": "^4.0.10",
     "buffer": "^6.0.3",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "jsdom": "^27.2.0",
     "process": "^0.11.10",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.3",
     "util": "^0.12.5",
-    "vite": "^7.2.2"
+    "vite": "^7.2.2",
+    "vitest": "^4.0.10"
   }
 }
