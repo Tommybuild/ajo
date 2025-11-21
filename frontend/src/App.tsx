@@ -1,21 +1,34 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAccount } from 'wagmi'
 import { Header } from './components/Header'
 import { PiggyBankDashboard } from './components/PiggyBankDashboard'
 import { WalletConnectPage } from './components/WalletConnectPage'
+import { AdminDashboard } from './components/AdminDashboard'
 import { TransactionToast } from './components/TransactionToast'
 import { useWalletHistory } from './hooks/useWalletHistory'
+import { usePiggyBank } from './hooks/usePiggyBank'
 import './App.css'
 import './styles/walletConnect.css'
 
-type Page = 'home' | 'wallet'
+type Page = 'home' | 'wallet' | 'admin'
 
 function App() {
-  const { isConnected } = useAccount()
+  const { isConnected, address } = useAccount()
   const [currentPage, setCurrentPage] = useState<Page>('home')
+  const [isAdmin, setIsAdmin] = useState(false)
+  const { owner } = usePiggyBank()
 
   // Track wallet connection history
   useWalletHistory()
+
+  // Check if current user is admin
+  useEffect(() => {
+    if (address && owner) {
+      setIsAdmin(address.toLowerCase() === owner.toLowerCase())
+    } else {
+      setIsAdmin(false)
+    }
+  }, [address, owner])
 
   return (
     <div className="app">
@@ -36,6 +49,14 @@ function App() {
         >
           🔗 Wallet Connect
         </button>
+        {isAdmin && (
+          <button
+            className={`nav-btn ${currentPage === 'admin' ? 'active' : ''}`}
+            onClick={() => setCurrentPage('admin')}
+          >
+            👑 Admin
+          </button>
+        )}
       </nav>
 
       <main className="main-content">
@@ -69,6 +90,8 @@ function App() {
               </div>
             </div>
           </div>
+        ) : currentPage === 'admin' ? (
+          <AdminDashboard />
         ) : (
           <PiggyBankDashboard />
         )}
