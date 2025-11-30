@@ -55,17 +55,19 @@ contract PiggyBank {
         owner = newOwner;
     }
 
-    function deposit() external payable {
+    function deposit() external payable whenNotPaused {
         require(msg.value > 0, "Must deposit something");
         emit Deposited(msg.sender, msg.value);
     }
 
-    function withdraw() external {
+    function withdraw() external whenNotPaused {
         require(block.timestamp >= unlockTime, "PiggyBank: Still locked");
         require(msg.sender == owner, "PiggyBank: Not owner");
         uint256 amount = address(this).balance;
         emit Withdrawn(msg.sender, amount);
-        payable(owner).transfer(amount);
+        // Use safe withdrawal pattern to prevent reentrancy
+        (bool success, ) = payable(owner).call{value: amount}("");
+        require(success, "Transfer failed");
     }
 
     function getBalance() external view returns (uint256) {
