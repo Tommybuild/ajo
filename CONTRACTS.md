@@ -13,21 +13,26 @@ This document describes the expected PiggyBank contract interface used by the Aj
 Functions (as used by the frontend ABI):
 
 - `constructor(uint256 _unlockTime) payable`
+
   - Initializes `owner` to `msg.sender` and sets the `unlockTime` timestamp (in seconds).
   - Optionally accepts initial ETH.
 
 - `function deposit() external payable`
+
   - Accepts ETH deposits. Does not change the lock time.
 
 - `function withdraw() external`
+
   - Reverts if `block.timestamp < unlockTime`.
   - Reverts if `msg.sender != owner`.
   - Transfers the entire contract balance to the owner.
 
 - `function getBalance() external view returns (uint256)`
+
   - Returns `address(this).balance`.
 
 - `function owner() external view returns (address)`
+
   - Returns the owner address.
 
 - `function unlockTime() external view returns (uint256)`
@@ -64,6 +69,129 @@ No other persistent storage is required by the frontend.
 
 ---
 
+## ⚡ Quick Setup Guide
+
+**Get the frontend running with a PiggyBank contract in under 5 minutes!**
+
+This section provides the fastest way to configure the frontend for testing with a local or deployed PiggyBank contract.
+
+### Prerequisites
+
+- Node.js (v18+) and npm
+- Foundry installed (for local contract deployment)
+- REOWN Project ID from [https://cloud.reown.com/](https://cloud.reown.com/)
+
+### 🚀 Fast Track Options
+
+#### Option A: Quick Local Setup (Fastest - 2 minutes)
+
+1. **Setup environment:**
+
+   ```bash
+   cd frontend
+   cp .env.example .env
+   ```
+
+2. **Use the automated setup script:**
+
+   ```bash
+   # Unix/Linux/macOS
+   ./scripts/switch-env.sh local
+
+   # Windows PowerShell
+   .\scripts\switch-env.ps1 -Environment local
+   ```
+
+3. **Start everything:**
+
+   ```bash
+   # Terminal 1: Start local blockchain
+   anvil
+
+   # Terminal 2: Deploy contract (if needed)
+   forge create PiggyBank --rpc-url http://localhost:8545 --constructor-args 3600
+
+   # Terminal 3: Start frontend
+   npm run dev
+   ```
+
+**🎯 Result:** Frontend runs at `http://localhost:3000` with local contract!
+
+#### Option B: Use Existing Testnet Contract (1 minute)
+
+1. **Get a testnet contract address** from your team or deploy one yourself.
+
+2. **Configure environment:**
+
+   ```bash
+   cd frontend
+   cp .env.example .env
+   # Edit .env and set:
+   VITE_REOWN_PROJECT_ID=your_project_id_here
+   VITE_PIGGYBANK_ADDRESS=0x_your_testnet_contract_address_here
+   ```
+
+3. **Start frontend:**
+   ```bash
+   npm run dev
+   ```
+
+**🎯 Result:** Frontend connected to Base Sepolia testnet!
+
+#### Option C: Production Mainnet Setup (1 minute)
+
+1. **Get your mainnet contract address.**
+
+2. **Configure environment:**
+
+   ```bash
+   cd frontend
+   cp .env.example .env
+   # Edit .env and set:
+   VITE_REOWN_PROJECT_ID=your_project_id_here
+   VITE_PIGGYBANK_ADDRESS=0x_your_mainnet_contract_address_here
+   ```
+
+3. **Start frontend:**
+   ```bash
+   npm run dev
+   ```
+
+**⚠️ Warning:** This uses real ETH on Base mainnet!
+
+### 🔄 Environment Switching
+
+Switch between environments instantly:
+
+```bash
+cd frontend
+
+# Switch to local development
+./scripts/switch-env.sh local
+
+# Switch to testnet
+./scripts/switch-env.sh sepolia
+
+# Switch to mainnet
+./scripts/switch-env.sh mainnet
+```
+
+### ✅ Verification Checklist
+
+- [ ] `VITE_REOWN_PROJECT_ID` is set in `.env`
+- [ ] `VITE_PIGGYBANK_ADDRESS` is set correctly for your target network
+- [ ] Frontend loads without errors
+- [ ] Wallet connects successfully
+- [ ] Contract address matches deployed contract on correct network
+
+### 🆘 Need Help?
+
+- **Detailed setup:** See full [Local Development Setup Guide](#-local-development-setup) below
+- **Script issues:** Check [Environment Management Scripts](#step-8-environment-management-script)
+- **Common problems:** See [Troubleshooting Local Development](#troubleshooting-local-development)
+
+---
+
 ## 🔧 Local Development Setup
 
 This section provides step-by-step instructions for contributors to set up local development and testing with the PiggyBank contract.
@@ -77,6 +205,7 @@ This section provides step-by-step instructions for contributors to set up local
 ### Step 1: Contract Development Setup
 
 1. **Clone and setup contracts:**
+
    ```bash
    git clone <your-contracts-repo>
    cd <your-contracts-repo>
@@ -94,11 +223,13 @@ This section provides step-by-step instructions for contributors to set up local
 #### Option A: Using Anvil (Recommended for local development)
 
 1. **Start Anvil local chain:**
+
    ```bash
    anvil
    ```
 
 2. **Deploy PiggyBank contract:**
+
    ```bash
    # Deploy with 1 hour unlock time (3600 seconds from now)
    forge create PiggyBank --rpc-url http://localhost:8545 --constructor-args 3600
@@ -113,12 +244,14 @@ This section provides step-by-step instructions for contributors to set up local
 #### Option B: Using Hardhat local network
 
 1. **Setup Hardhat project:**
+
    ```bash
    npm install --save-dev hardhat
    npx hardhat init
    ```
 
 2. **Deploy script:**
+
    ```javascript
    // scripts/deploy.js
    async function main() {
@@ -138,17 +271,20 @@ This section provides step-by-step instructions for contributors to set up local
 ### Step 3: Frontend Configuration for Local Development
 
 1. **Setup frontend:**
+
    ```bash
    cd frontend
    npm install
    ```
 
 2. **Configure environment variables:**
+
    ```bash
    cp .env.example .env
    ```
 
 3. **Edit `.env` file:**
+
    ```env
    VITE_REOWN_PROJECT_ID=your_project_id_from_cloud_reown
    VITE_PIGGYBANK_ADDRESS=0x5FbDB2315678afecb367f032d93F642f64180aa3
@@ -164,17 +300,20 @@ This section provides step-by-step instructions for contributors to set up local
 #### Complete Local Setup (Contracts + Frontend)
 
 1. **Terminal 1 - Start local blockchain:**
+
    ```bash
    anvil
    ```
 
 2. **Terminal 2 - Deploy contracts:**
+
    ```bash
    forge create PiggyBank --rpc-url http://localhost:8545 --constructor-args 3600
    # Copy the deployed address
    ```
 
 3. **Terminal 3 - Setup and start frontend:**
+
    ```bash
    cd frontend
    cp .env.example .env
@@ -207,20 +346,22 @@ VITE_PIGGYBANK_ADDRESS_MAINNET=0xabcdefabcdefabcdefabcdefabcdefabcdefabcd
 ### Step 5: Contract Verification and Debugging
 
 1. **Verify local contract deployment:**
+
    ```bash
    # Check contract exists
    cast code 0x5FbDB2315678afecb367f032d93F642f64180aa3 --rpc-url http://localhost:8545
-   
+
    # Call contract functions
    cast call 0x5FbDB2315678afecb367f032d93F642f64180aa3 "owner()" --rpc-url http://localhost:8545
    cast call 0x5FbDB2315678afecb367f032d93F642f64180aa3 "unlockTime()" --rpc-url http://localhost:8545
    ```
 
 2. **Test contract interactions:**
+
    ```bash
    # Deposit 1 ETH
    cast send 0x5FbDB2315678afecb367f032d93F642f64180aa3 "deposit()" --value 1ether --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --rpc-url http://localhost:8545
-   
+
    # Check balance
    cast call 0x5FbDB2315678afecb367f032d93F642f64180aa3 "getBalance()" --rpc-url http://localhost:8545
    ```
@@ -228,6 +369,7 @@ VITE_PIGGYBANK_ADDRESS_MAINNET=0xabcdefabcdefabcdefabcdefabcdefabcdefabcd
 ### Step 6: Frontend Testing with Local Contract
 
 1. **Open frontend in browser:**
+
    - Go to `http://localhost:3000`
    - Connect MetaMask to localhost network
    - Import Anvil test account
@@ -243,11 +385,13 @@ VITE_PIGGYBANK_ADDRESS_MAINNET=0xabcdefabcdefabcdefabcdefabcdefabcdefabcd
 **Common Issues:**
 
 1. **"Contract not deployed" error:**
+
    - Verify contract address in `.env`
    - Check local chain is running
    - Ensure correct network is selected in MetaMask
 
 2. **"Function not found" error:**
+
    - Verify ABI matches deployed contract
    - Check contract address is correct
    - Clear browser cache and restart frontend
@@ -258,6 +402,7 @@ VITE_PIGGYBANK_ADDRESS_MAINNET=0xabcdefabcdefabcdefabcdefabcdefabcdefabcd
    - Check if you're the contract owner
 
 **Debug Commands:**
+
 ```bash
 # Check chain ID
 cast chain-id --rpc-url http://localhost:8545
@@ -274,12 +419,14 @@ cast gas-price --rpc-url http://localhost:8545
 #### Base Sepolia Testnet Deployment
 
 1. **Setup environment variables:**
+
    ```bash
    export RPC_URL="https://sepolia.base.org"
    export PRIVATE_KEY="your_private_key_here"
    ```
 
 2. **Deploy to testnet:**
+
    ```bash
    forge create PiggyBank --rpc-url $RPC_URL --private-key $PRIVATE_KEY --constructor-args 3600
    ```
@@ -292,12 +439,14 @@ cast gas-price --rpc-url http://localhost:8545
 #### Base Mainnet Deployment
 
 1. **Setup mainnet environment:**
+
    ```bash
    export RPC_URL="https://mainnet.base.org"
    export PRIVATE_KEY="your_mainnet_private_key"
    ```
 
 2. **Deploy to mainnet:**
+
    ```bash
    forge create PiggyBank --rpc-url $RPC_URL --private-key $PRIVATE_KEY --constructor-args 31536000
    # (1 year unlock time for production)
@@ -342,6 +491,7 @@ echo "✅ Environment switched. Restart frontend with: npm run dev"
 ```
 
 Make executable and use:
+
 ```bash
 chmod +x scripts/switch-env.sh
 ./scripts/switch-env.sh local

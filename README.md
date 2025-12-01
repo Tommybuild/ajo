@@ -22,15 +22,15 @@ Key capabilities:
 
 ## Tech Stack
 
-| Layer               | Technology                          |
-| ------------------- | ----------------------------------- |
-| Frontend            | React 19, Vite 7, TypeScript        |
-| State / Data        | TanStack Query                      |
-| Wallet Integration  | REOWN AppKit, WalletConnect v2      |
-| Ethereum Toolkit    | Wagmi, Viem                         |
-| Blockchain Network  | Base (Testnet / Mainnet ready)      |
-| Smart Contracts     | Solidity (via Foundry – external)   |
-| Tooling & Quality   | ESLint, TypeScript, Prettier        |
+| Layer              | Technology                        |
+| ------------------ | --------------------------------- |
+| Frontend           | React 19, Vite 7, TypeScript      |
+| State / Data       | TanStack Query                    |
+| Wallet Integration | REOWN AppKit, WalletConnect v2    |
+| Ethereum Toolkit   | Wagmi, Viem                       |
+| Blockchain Network | Base (Testnet / Mainnet ready)    |
+| Smart Contracts    | Solidity (via Foundry – external) |
+| Tooling & Quality  | ESLint, TypeScript, Prettier      |
 
 ---
 
@@ -70,6 +70,7 @@ Use this if you want to run both the contracts (in your own Foundry repo) and th
 
 **🔧 For Complete Local Development Setup:**  
 See the comprehensive [Local Development Setup Guide in CONTRACTS.md](./CONTRACTS.md#-local-development-setup) for detailed step-by-step instructions on:
+
 - Setting up local blockchain with Anvil
 - Deploying contracts locally
 - Configuring frontend for local testing
@@ -126,7 +127,9 @@ VITE_PIGGYBANK_ADDRESS=your_deployed_piggybank_contract_address_here
 **🌐 Setting VITE_PIGGYBANK_ADDRESS by Environment:**
 
 **For Local Development:**
+
 1. **Local Network (Hardhat/Foundry/Anvil):**
+
    ```bash
    # Deploy your contract to local network
    forge create PiggyBank --rpc-url http://localhost:8545
@@ -141,6 +144,7 @@ VITE_PIGGYBANK_ADDRESS=your_deployed_piggybank_contract_address_here
    ```
 
 **For Base Sepolia Testnet:**
+
 1. Deploy your PiggyBank contract to Base Sepolia:
    ```bash
    # Deploy to Base Sepolia testnet
@@ -156,6 +160,7 @@ VITE_PIGGYBANK_ADDRESS=your_deployed_piggybank_contract_address_here
    ```
 
 **For Base Mainnet (Production):**
+
 1. Deploy your PiggyBank contract to Base mainnet
 2. Verify the contract on [BaseScan](https://basescan.org/)
 3. Set the verified mainnet address:
@@ -164,11 +169,13 @@ VITE_PIGGYBANK_ADDRESS=your_deployed_piggybank_contract_address_here
    ```
 
 **🔗 Finding Contract Addresses:**
+
 - **Base Sepolia:** [https://sepolia.basescan.org/](https://sepolia.basescan.org/)
 - **Base Mainnet:** [https://basescan.org/](https://basescan.org/)
 - **Local:** Check your deployment script terminal output
 
-**⚠️  Important Notes:**
+**⚠️ Important Notes:**
+
 - Testnet and mainnet addresses are **completely different** and NOT interchangeable
 - The frontend will fail to load if this address is incorrect or missing
 - Always use the correct address for your target network
@@ -211,6 +218,224 @@ From the `frontend/` directory:
   ```bash
   npm run type-check
   ```
+
+---
+
+## 🔧 Contract Configuration Guide
+
+**Step-by-step guide to configure the frontend with a PiggyBank contract address for testing.**
+
+This section provides focused instructions for setting up the `VITE_PIGGYBANK_ADDRESS` environment variable to connect your frontend to the correct contract on the right network.
+
+### ⚡ Quick Setup (3 Options)
+
+#### 🏠 Option A: Local Development (Fastest)
+
+**Use this for local testing with Anvil/Hardhat blockchain:**
+
+1. **Run the automated setup:**
+
+   ```bash
+   cd frontend
+   ./scripts/switch-env.sh local
+   ```
+
+2. **Start the local blockchain:**
+
+   ```bash
+   anvil
+   ```
+
+3. **Deploy contract (if not already deployed):**
+
+   ```bash
+   forge create PiggyBank --rpc-url http://localhost:8545 --constructor-args 3600
+   ```
+
+4. **Update contract address in `.env` if needed:**
+
+   ```env
+   VITE_PIGGYBANK_ADDRESS=0x_your_deployed_local_contract_address
+   ```
+
+5. **Start frontend:**
+   ```bash
+   npm run dev
+   ```
+
+**✅ Result:** Frontend running at `http://localhost:3000` with local contract!
+
+---
+
+#### 🧪 Option B: Base Sepolia Testnet
+
+**Use this for testing with Base Sepolia testnet:**
+
+1. **Deploy your contract to testnet:**
+
+   ```bash
+   export RPC_URL="https://sepolia.base.org"
+   export PRIVATE_KEY="your_private_key_here"
+   forge create PiggyBank --rpc-url $RPC_URL --private-key $PRIVATE_KEY --constructor-args 3600
+   ```
+
+2. **Copy the deployed contract address** from the deployment output.
+
+3. **Configure environment:**
+
+   ```bash
+   cd frontend
+   cp .env.example .env
+   # Edit .env and set:
+   VITE_PIGGYBANK_ADDRESS=0x_your_testnet_contract_address_here
+   ```
+
+4. **Start frontend:**
+   ```bash
+   npm run dev
+   ```
+
+**🔗 Find your contract:**
+
+- **Base Sepolia Explorer:** [https://sepolia.basescan.org/](https://sepolia.basescan.org/)
+- Search by transaction hash or address
+
+**✅ Result:** Frontend connected to Base Sepolia testnet!
+
+---
+
+#### 🚀 Option C: Base Mainnet (Production)
+
+**Use this for production with real ETH on Base mainnet:**
+
+1. **Deploy your contract to mainnet:**
+
+   ```bash
+   export RPC_URL="https://mainnet.base.org"
+   export PRIVATE_KEY="your_mainnet_private_key"
+   forge create PiggyBank --rpc-url $RPC_URL --private-key $PRIVATE_KEY --constructor-args 31536000
+   ```
+
+2. **Copy the deployed contract address.**
+
+3. **Configure environment:**
+
+   ```bash
+   cd frontend
+   cp .env.example .env
+   # Edit .env and set:
+   VITE_PIGGYBANK_ADDRESS=0x_your_mainnet_contract_address_here
+   ```
+
+4. **Start frontend:**
+   ```bash
+   npm run dev
+   ```
+
+**⚠️ Warning:** This uses real ETH on Base mainnet!
+
+**🔗 Find your contract:**
+
+- **BaseScan:** [https://basescan.org/](https://basescan.org/)
+
+**✅ Result:** Frontend connected to Base mainnet!
+
+---
+
+### 🔄 Quick Environment Switching
+
+**Switch between networks instantly:**
+
+```bash
+cd frontend
+
+# Switch to local development
+./scripts/switch-env.sh local
+
+# Switch to Base Sepolia testnet
+./scripts/switch-env.sh sepolia
+
+# Switch to Base mainnet
+./scripts/switch-env.sh mainnet
+```
+
+**Windows users:**
+
+```powershell
+.\scripts\switch-env.ps1 -Environment local
+.\scripts\switch-env.ps1 -Environment sepolia
+.\scripts\switch-env.ps1 -Environment mainnet
+```
+
+---
+
+### 📋 Manual Configuration Steps
+
+If you prefer to configure manually:
+
+1. **Edit the `.env` file:**
+
+   ```bash
+   cd frontend
+   cp .env.example .env
+   nano .env  # or use your preferred editor
+   ```
+
+2. **Set the required variables:**
+
+   ```env
+   VITE_REOWN_PROJECT_ID=your_project_id_from_cloud_reown
+   VITE_PIGGYBANK_ADDRESS=0x_your_contract_address_here
+   ```
+
+3. **Verify your setup:**
+   - Network: Ensure you're connected to the correct network in MetaMask
+   - Contract: Verify the address matches your deployed contract
+   - Frontend: Check that the app loads without errors
+
+---
+
+### 🎯 Contract Address Sources
+
+| Network          | How to Get Contract Address                            |
+| ---------------- | ------------------------------------------------------ |
+| **Local**        | Check deployment script output or use Anvil's default  |
+| **Base Sepolia** | [Base Sepolia Explorer](https://sepolia.basescan.org/) |
+| **Base Mainnet** | [BaseScan](https://basescan.org/)                      |
+
+---
+
+### ⚠️ Important Notes
+
+- **Network-specific:** Contract addresses are network-specific and not interchangeable
+- **Required for functionality:** `VITE_PIGGYBANK_ADDRESS` must be set correctly
+- **Frontend will fail to load** if this address is incorrect or missing
+- **Testnet vs Mainnet:** Never use testnet addresses on mainnet or vice versa
+
+---
+
+### 🆘 Troubleshooting
+
+**Common issues:**
+
+- **"Contract not deployed" error:** Check contract address and network
+- **"Function not found" error:** Verify ABI matches deployed contract
+- **Transaction fails:** Check account balance and network connection
+
+**For detailed troubleshooting:** See [CONTRACTS.md](./CONTRACTS.md#troubleshooting-local-development)
+
+---
+
+### 🔗 Next Steps
+
+After configuring the contract address:
+
+1. **Start the development server:** `npm run dev`
+2. **Connect your wallet** to the appropriate network
+3. **Test the functionality** with deposits and withdrawals
+4. **Verify contract interactions** work as expected
+
+**For complete local development setup:** See [CONTRACTS.md#-local-development-setup](./CONTRACTS.md#-local-development-setup)
 
 ---
 
@@ -287,6 +512,115 @@ forge test -vvv
 ```
 
 Adapt these commands to match your actual contracts repository structure.
+---
+
+## 🔧 Development Diagnostics
+
+The application includes a comprehensive developer-only diagnostics system for troubleshooting blockchain connectivity, contract interactions, and environment configuration issues.
+
+### 🛠️ Accessing Diagnostics
+
+**Development Mode Only:** The diagnostics feature is only available when `NODE_ENV=development`.
+
+1. **Start the development server:**
+   ```bash
+   cd frontend
+   npm run dev
+   ```
+
+2. **Navigate to the Debug page:**
+   - Look for the "🔧 Debug" button in the navigation menu
+   - Only visible in development mode
+   - Click to access the comprehensive diagnostics dashboard
+
+### 📊 Diagnostics Features
+
+#### 🌐 Blockchain Connection Status
+- **RPC Connectivity**: Test if the RPC endpoint is reachable
+- **Network Details**: Chain ID, network name, and type (mainnet/testnet)
+- **Block Information**: Latest block number and timestamp
+- **Connection Status**: Real-time connection health with error details
+
+#### 📜 Contract Status
+- **Contract Validation**: Verify contract address format and validity
+- **Deployment Status**: Check if contract is deployed at specified address
+- **ABI Validation**: Confirm ABI structure and available functions
+- **Function Analysis**: List all available contract functions with state mutability
+- **Event Analysis**: Display contract events and their parameters
+- **Network Matching**: Ensure contract network matches frontend configuration
+
+#### 💳 Recent Transactions
+- **Transaction History**: Display recent wallet transactions
+- **Status Tracking**: Show pending, success, or error states
+- **Hash & Details**: Copy transaction hashes and view block numbers
+- **Error Reporting**: Display transaction errors when available
+
+#### ⚙️ Environment Information
+- **Environment Flags**: Node environment (development/production)
+- **Configuration Status**: Verify required environment variables
+- **Build Information**: App version and build timestamp
+- **Feature Flags**: Check enabled diagnostics and debug features
+- **Wallet Connection**: Current wallet address, connector, and network details
+
+### 🚀 Using Diagnostics
+
+#### Basic Troubleshooting
+1. **Start with the header overview** - Check overall connection status
+2. **Expand sections** as needed by clicking section headers
+3. **Use refresh button** to reload diagnostic data
+4. **Copy values** by clicking on copyable fields (RPC URLs, addresses, hashes)
+
+#### Common Issues & Solutions
+
+**🔴 Blockchain Connection Issues:**
+- **"Disconnected" status**: Check network configuration and RPC endpoint
+- **RPC errors**: Verify network connectivity and RPC URL validity
+- **Network mismatch**: Ensure frontend chain ID matches expected network
+
+**🔴 Contract Issues:**
+- **"Invalid Address"**: Check `VITE_PIGGYBANK_ADDRESS` environment variable
+- **"Not Deployed"**: Verify contract is deployed on the correct network
+- **"ABI Error"**: Ensure contract ABI matches deployed contract version
+- **"Network Mismatch"**: Check that contract is deployed on the expected network
+
+**🔴 Transaction Issues:**
+- **"Pending" status**: Wait for transaction confirmation
+- **"Error" status**: Check transaction details for specific error messages
+- **No transactions**: Normal for new deployments or cleared data
+
+**🔴 Environment Issues:**
+- **"Missing" REOWN Project**: Set `VITE_REOWN_PROJECT_ID` in `.env`
+- **"Not Configured" Contract**: Set `VITE_PIGGYBANK_ADDRESS` in `.env`
+- **Production Mode**: Debug page only available in development
+
+### 🧪 Running Diagnostics Tests
+
+The diagnostics feature includes comprehensive unit tests:
+
+```bash
+cd frontend
+
+# Run all tests
+npm run test
+
+# Run diagnostics-specific tests
+npm run test diagnostics.test.ts
+
+# Run tests with UI
+npm run test:ui
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+### 🔒 Security Notes
+
+- **Development Only**: Diagnostics page is automatically hidden in production
+- **No Sensitive Data**: Diagnostics don't expose private keys or sensitive information
+- **Local Storage**: Transaction data stored only in browser localStorage
+- **Read-Only**: Diagnostics provides read-only access to blockchain data
+
+---
 
 ---
 
@@ -341,4 +675,5 @@ Note: This repo hosts the frontend. Contract deployment/verification typically l
 ---
 
 ## License
+
 MIT

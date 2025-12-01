@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useAccount, useBalance, useDisconnect } from 'wagmi'
 import { formatEther } from 'viem'
-import { CheckIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline'
 
 export function WalletInfo() {
   const { address, isConnected, chain } = useAccount()
@@ -63,9 +62,9 @@ export function WalletInfo() {
             aria-label="Copy to clipboard"
           >
             {copied ? (
-              <CheckIcon className="h-5 w-5 text-green-500" />
+              <span style={{ color: 'var(--success)', fontSize: '0.875rem' }}>✓</span>
             ) : (
-              <DocumentDuplicateIcon className="h-5 w-5 text-gray-400 group-hover:text-gray-600" />
+              <span style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>📋</span>
             )}
             <span className="tooltip">{copied ? 'Copied!' : 'Copy'}</span>
           </button>
