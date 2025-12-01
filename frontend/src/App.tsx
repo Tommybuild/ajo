@@ -7,11 +7,12 @@ import { AdminDashboard } from './components/AdminDashboard'
 import { TransactionToast } from './components/TransactionToast'
 import { useWalletHistory } from './hooks/useWalletHistory'
 import { usePiggyBank } from './hooks/usePiggyBank'
+import { DebugPage } from './components/DebugPage'
 import './App.css'
 import './styles/walletConnect.css'
 import './styles/saveForLater.css'
 
-type Page = 'home' | 'wallet' | 'admin'
+type Page = 'home' | 'wallet' | 'admin' | 'debug'
 
 function App() {
   const { isConnected, address } = useAccount()
@@ -58,6 +59,14 @@ function App() {
             👑 Admin
           </button>
         )}
+        {process.env.NODE_ENV === 'development' && (
+          <button
+            className={`nav-btn ${currentPage === 'debug' ? 'active' : ''}`}
+            onClick={() => setCurrentPage('debug')}
+          >
+            🔧 Debug
+          </button>
+        )}
       </nav>
 
       <main className="main-content">
@@ -93,6 +102,8 @@ function App() {
           </div>
         ) : currentPage === 'admin' ? (
           <AdminDashboard />
+        ) : currentPage === 'debug' ? (
+          <DebugPage />
         ) : (
           <PiggyBankDashboard />
         )}
