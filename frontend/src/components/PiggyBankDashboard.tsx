@@ -19,12 +19,17 @@ export function PiggyBankDashboard() {
     return saved ? JSON.parse(saved) : []
   })
   const [showSavedStates, setShowSavedStates] = useState(false)
+  const [currentAmount, setCurrentAmount] = useState('')
 
   const handleSaveState = (name: string, amount: string, unlockTime: number) => {
+    // Input validation and sanitization
+    const sanitizedName = name.trim().substring(0, 100); // Limit length
+    const validatedAmount = amount && !isNaN(parseFloat(amount)) ? amount : '0';
+    
     const newState: SavedState = {
       id: Date.now().toString(),
-      name,
-      amount,
+      name: sanitizedName,
+      amount: validatedAmount,
       unlockTime,
       date: new Date().toISOString()
     }
@@ -53,7 +58,6 @@ export function PiggyBankDashboard() {
           savedStates={savedStates}
           onLoadState={(state) => {
             // Handle loading a saved state
-            console.log('Loading state:', state)
             setShowSavedStates(false)
           }}
           onDeleteState={(id) => {
@@ -85,14 +89,13 @@ export function PiggyBankDashboard() {
         <div className="tab-content">
           {activeTab === 'deposit' ? (
             <>
-              <DepositForm />
+              <DepositForm onAmountChange={setCurrentAmount} />
               <button 
                 className="save-later-button"
                 onClick={() => {
                   const name = prompt('Name this saved state (e.g., "Summer Vacation Fund"):')
                   if (name) {
-                    const amount = (document.querySelector('#amount') as HTMLInputElement)?.value || '0'
-                    handleSaveState(name, amount, Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60) // Default 30 days
+                    handleSaveState(name, currentAmount || '0', Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60) // Default 30 days
                   }
                 }}
               >
