@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { BalanceCard } from './BalanceCard'
 import { DepositForm } from './DepositForm'
 import { WithdrawButton } from './WithdrawButton'
 import { SaveForLater } from './SaveForLater'
+import { SecurePrompt, useSecurePrompt } from './SecurePrompt'
 
 interface SavedState {
   id: string;
@@ -10,6 +11,42 @@ interface SavedState {
   amount: string;
   unlockTime: number;
   date: string;
+}
+
+// Secure Save for Later button component
+function SaveForLaterButton({ onSave }: { onSave: (name: string, amount: string, unlockTime: number) => void }) {
+  const { showPrompt, PromptComponent } = useSecurePrompt()
+
+  const handleSaveClick = async () => {
+    try {
+      const name = await showPrompt({
+        title: 'Save Piggy Bank State',
+        message: 'Enter a name for this saved state (e.g., "Summer Vacation Fund"):',
+        placeholder: 'State name...',
+        maxLength: 50
+      })
+
+      // Get amount safely without DOM manipulation
+      const amountInput = document.querySelector('#amount') as HTMLInputElement
+      const amount = amountInput?.value || '0'
+      
+      onSave(name, amount, Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60) // Default 30 days
+    } catch (error) {
+      // User cancelled
+    }
+  }
+
+  return (
+    <>
+      <button 
+        className="save-later-button"
+        onClick={handleSaveClick}
+      >
+        💾 Save for Later
+      </button>
+      {PromptComponent}
+    </>
+  )
 }
 
 export function PiggyBankDashboard() {
@@ -86,18 +123,7 @@ export function PiggyBankDashboard() {
           {activeTab === 'deposit' ? (
             <>
               <DepositForm />
-              <button 
-                className="save-later-button"
-                onClick={() => {
-                  const name = prompt('Name this saved state (e.g., "Summer Vacation Fund"):')
-                  if (name) {
-                    const amount = (document.querySelector('#amount') as HTMLInputElement)?.value || '0'
-                    handleSaveState(name, amount, Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60) // Default 30 days
-                  }
-                }}
-              >
-                💾 Save for Later
-              </button>
+              <SaveForLaterButton onSave={handleSaveState} />
             </>
           ) : (
             <WithdrawButton />

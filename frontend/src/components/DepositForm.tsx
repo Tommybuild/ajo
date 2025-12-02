@@ -3,11 +3,13 @@ import { usePiggyBank } from '../hooks/usePiggyBank';
 import { useTimelock } from '../hooks/useTimelock';
 import { BUTTONS, LABELS, MESSAGES, VALIDATION } from '../constants/uxCopy';
 import { formatLockTime } from '../constants/uxCopy';
+import { useSecureAlert } from './SecureNotification';
 
 export function DepositForm() {
   const [amount, setAmount] = useState('')
   const { deposit, isPending, isConfirming, isSuccess, refetchBalance, unlockTime } = usePiggyBank()
   const { timeRemaining } = useTimelock(unlockTime)
+  const { error: showError } = useSecureAlert()
 
   useEffect(() => {
     if (isSuccess) {
@@ -19,7 +21,7 @@ export function DepositForm() {
   const handleDeposit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!amount || parseFloat(amount) <= 0) {
-      alert(VALIDATION.INVALID_AMOUNT);
+      showError('Invalid Amount', VALIDATION.INVALID_AMOUNT);
       return;
     }
     deposit(amount);
