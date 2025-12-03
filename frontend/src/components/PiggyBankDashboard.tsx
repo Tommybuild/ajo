@@ -15,7 +15,13 @@ interface SavedState {
 }
 
 // Secure Save for Later button component
-function SaveForLaterButton({ onSave }: { onSave: (name: string, amount: string, unlockTime: number) => void }) {
+function SaveForLaterButton({ 
+  onSave, 
+  amount 
+}: { 
+  onSave: (name: string, amount: string, unlockTime: number) => void,
+  amount: string 
+}) {
   const { showPrompt, PromptComponent } = useSecurePrompt()
   const isMobile = useMobile()
 
@@ -27,12 +33,8 @@ function SaveForLaterButton({ onSave }: { onSave: (name: string, amount: string,
         placeholder: 'State name...',
         maxLength: 50
       })
-
-      // Get amount safely without DOM manipulation
-      const amountInput = document.querySelector('#amount') as HTMLInputElement
-      const amount = amountInput?.value || '0'
       
-      onSave(name, amount, Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60) // Default 30 days
+      onSave(name, amount || '0', Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60) // Default 30 days
     } catch (error) {
       // User cancelled
     }
@@ -53,6 +55,11 @@ function SaveForLaterButton({ onSave }: { onSave: (name: string, amount: string,
 
 export function PiggyBankDashboard() {
   const [activeTab, setActiveTab] = useState<'deposit' | 'withdraw'>('deposit')
+  const [amount, setAmount] = useState('')
+  const [savedStates, setSavedStates] = useState<SavedState[]>(() => {
+    const saved = localStorage.getItem('savedPiggyStates')
+    return saved ? JSON.parse(saved) : []
+  })
   const [savedStates, setSavedStates] = useState<SavedState[]>([])
   const [showSavedStates, setShowSavedStates] = useState(false)
   const [currentAmount, setCurrentAmount] = useState('')
@@ -158,8 +165,8 @@ export function PiggyBankDashboard() {
         <div className="tab-content">
           {activeTab === 'deposit' ? (
             <>
-              <DepositForm />
-              <SaveForLaterButton onSave={handleSaveState} />
+              <DepositForm amount={amount} setAmount={setAmount} />
+              <SaveForLaterButton onSave={handleSaveState} amount={amount} />
             </>
           ) : (
             <WithdrawButton />

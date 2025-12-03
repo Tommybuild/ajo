@@ -7,6 +7,11 @@ import { formatLockTime } from '../constants/uxCopy';
 import { useSecureAlert } from './SecureNotification';
 
 interface DepositFormProps {
+  amount: string;
+  setAmount: (amount: string) => void;
+}
+
+export function DepositForm({ amount, setAmount }: DepositFormProps) {
   onAmountChange?: (amount: string) => void;
 }
 
@@ -29,7 +34,7 @@ export function DepositForm({ onAmountChange }: DepositFormProps) {
       setAmount('')
       refetchBalance()
     }
-  }, [isSuccess, refetchBalance])
+  }, [isSuccess, refetchBalance, setAmount])
 
   const handleDeposit = (e: React.FormEvent) => {
     e.preventDefault();
