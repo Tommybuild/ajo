@@ -6,8 +6,12 @@ import { BUTTONS, LABELS, MESSAGES, VALIDATION } from '../constants/uxCopy';
 import { formatLockTime } from '../constants/uxCopy';
 import { useSecureAlert } from './SecureNotification';
 
-export function DepositForm() {
-  const [amount, setAmount] = useState('')
+interface DepositFormProps {
+  amount: string;
+  setAmount: (amount: string) => void;
+}
+
+export function DepositForm({ amount, setAmount }: DepositFormProps) {
   const { deposit, isPending, isConfirming, isSuccess, refetchBalance, unlockTime } = usePiggyBank()
   const { timeRemaining } = useTimelock(unlockTime)
   const { error: showError } = useSecureAlert()
@@ -18,7 +22,7 @@ export function DepositForm() {
       setAmount('')
       refetchBalance()
     }
-  }, [isSuccess, refetchBalance])
+  }, [isSuccess, refetchBalance, setAmount])
 
   const handleDeposit = (e: React.FormEvent) => {
     e.preventDefault();
