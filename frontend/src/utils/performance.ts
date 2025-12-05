@@ -9,6 +9,16 @@ interface PerformanceMetric {
   category: 'render' | 'api' | 'interaction' | 'network'
 }
 
+interface MemoryInfo {
+  usedJSHeapSize: number
+  totalJSHeapSize: number
+  jsHeapSizeLimit: number
+}
+
+interface PerformanceMemory extends Performance {
+  memory: MemoryInfo
+}
+
 // Performance monitoring cache
 const performanceMetrics: PerformanceMetric[] = []
 
@@ -157,7 +167,8 @@ export function createLazyLoader<T>(
  */
 export function getMemoryUsage() {
   if ('memory' in performance) {
-    const memInfo = (performance as any).memory
+    const perfWithMemory = performance as PerformanceMemory
+    const memInfo = perfWithMemory.memory
     return {
       usedJSHeapSize: memInfo.usedJSHeapSize,
       totalJSHeapSize: memInfo.totalJSHeapSize,
