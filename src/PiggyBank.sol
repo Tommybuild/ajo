@@ -1,4 +1,4 @@
- // SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
 /**
@@ -10,6 +10,7 @@ contract PiggyBank {
     address public owner;
     uint256 public unlockTime;
     bool public paused;
+    mapping(address => uint256) public deposits;
 
     event Deposited(address indexed depositor, uint256 amount);
     event Withdrawn(address indexed withdrawer, uint256 amount);
@@ -57,16 +58,21 @@ contract PiggyBank {
 
     function deposit() external payable whenNotPaused {
         require(msg.value > 0, "Must deposit something");
+        deposits[msg.sender] += msg.value;
         emit Deposited(msg.sender, msg.value);
     }
 
     function withdraw() external whenNotPaused {
         require(block.timestamp >= unlockTime, "PiggyBank: Still locked");
-        require(msg.sender == owner, "PiggyBank: Not owner");
-        uint256 amount = address(this).balance;
+        uint256 amount = deposits[msg.sender];
+        require(amount > 0, "No deposits to withdraw");
+
+        // Reset deposit before transfer to prevent reentrancy
+        deposits[msg.sender] = 0;
+
         emit Withdrawn(msg.sender, amount);
         // Use safe withdrawal pattern to prevent reentrancy
-        (bool success, ) = payable(owner).call{value: amount}("");
+        (bool success, ) = payable(msg.sender).call{value: amount}("");
         require(success, "Transfer failed");
     }
 
