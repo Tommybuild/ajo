@@ -76,6 +76,8 @@ export function usePiggyBank() {
       )) {
         debouncedRefetch()
       }
+      console.log('Deposited event:', logs)
+      depositedEventRef.current?.()
     },
   })
 
@@ -92,6 +94,8 @@ export function usePiggyBank() {
       )) {
         debouncedRefetch()
       }
+      console.log('Withdrawn event:', logs)
+      withdrawnEventRef.current?.()
     },
   })
 

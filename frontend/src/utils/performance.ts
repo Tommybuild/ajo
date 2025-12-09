@@ -34,6 +34,17 @@ interface PerformanceBenchmark {
 }
 
 // Performance monitoring cache with enhanced features
+interface MemoryInfo {
+  usedJSHeapSize: number
+  totalJSHeapSize: number
+  jsHeapSizeLimit: number
+}
+
+interface PerformanceMemory extends Performance {
+  memory: MemoryInfo
+}
+
+// Performance monitoring cache
 const performanceMetrics: PerformanceMetric[] = []
 const performanceAlerts: PerformanceAlert[] = []
 const benchmarks = new Map<string, PerformanceBenchmark>()
@@ -215,6 +226,11 @@ export function getPerformanceAlerts(severity?: PerformanceAlert['severity'], re
   if (severity) {
     alerts = alerts.filter(a => a.severity === severity)
   }
+export function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  let timeoutId: NodeJS.Timeout
   
   if (resolved !== undefined) {
     alerts = alerts.filter(a => a.resolved === resolved)
@@ -248,6 +264,11 @@ export function getAverageMetric(name: string, category?: string, timeRange?: nu
 } {
   const metrics = getPerformanceMetrics(category, timeRange)
     .filter(m => m.name === name)
+export function throttle<T extends (...args: any[]) => any>(
+  func: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  let lastCall = 0
   
   if (metrics.length === 0) {
     return { average: 0, median: 0, percentile95: 0, percentile99: 0, sampleCount: 0, confidence: 0 }
@@ -314,9 +335,8 @@ export function measureNetworkRequest(url: string, startTime: number): () => voi
  */
 export function getMemoryUsage() {
   if ('memory' in performance) {
-    const memInfo = (performance as any).memory
-    const usagePercentage = (memInfo.usedJSHeapSize / memInfo.jsHeapSizeLimit) * 100
-    
+    const perfWithMemory = performance as PerformanceMemory
+    const memInfo = perfWithMemory.memory
     return {
       usedJSHeapSize: memInfo.usedJSHeapSize,
       totalJSHeapSize: memInfo.totalJSHeapSize,
