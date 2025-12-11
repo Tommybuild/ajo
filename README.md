@@ -4,6 +4,21 @@ Ajo PiggyBank is a decentralized savings application that allows users to deposi
 
 ---
 
+## 📖 Table of Contents
+
+- [Overview](#overview)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Frontend – Getting Started](#frontend--getting-started)
+- [Contract Configuration Guide](#🔧-contract-configuration-guide)
+- [Smart Contract (Conceptual Overview)](#smart-contract-conceptual-overview)
+- [Testing and Quality](#testing-and-quality)
+- [Development Diagnostics](#🔧-development-diagnostics)
+- [Deployment](#deployment)
+- [CI/CD](#cicd)
+- [Security and Disclaimer](#security-and-disclaimer)
+- [License](#license)
+
 ## Overview
 
 The Ajo PiggyBank dApp is built to encourage disciplined savings by enforcing time-locked deposits on-chain.
