@@ -17,8 +17,8 @@ interface Toast {
  * This ensures users always receive feedback about their transaction status.
  */
 export function TransactionToast() {
-  const [toasts, setToasts] = useState<Toast[]>([])
-  const [pendingTxHash, setPendingTxHash] = useState<`0x${string}` | undefined>()
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [pendingTxHash, setPendingTxHash] = useState<`0x${string}` | undefined>();
 
   // Watch for pending transactions
   useWatchPendingTransactions({

@@ -9,23 +9,18 @@ import { SecureInput } from './ui/SecureInput';
 import { validateEthAmount } from '../utils/security';
 
 interface DepositFormProps {
-  amount: string;
-  setAmount: (amount: string) => void;
-}
-
-export function DepositForm({ amount, setAmount }: DepositFormProps) {
   onAmountChange?: (amount: string) => void;
 }
 
 export function DepositForm({ onAmountChange }: DepositFormProps) {
-  const [amount, setAmount] = useState('')
-  const { deposit, isPending, isConfirming, isSuccess, refetchBalance, unlockTime } = usePiggyBank()
-  const { timeRemaining } = useTimelock(unlockTime)
-  const { error: showError } = useSecureAlert()
-  const isMobile = useMobile()
-  const [secureAmount, setSecureAmount] = useState('')
-  const [amountValid, setAmountValid] = useState(false)
-  const [validationError, setValidationError] = useState('')
+  const [amount, setAmount] = useState('');
+  const { deposit, isPending, isConfirming, isSuccess, refetchBalance, unlockTime } = usePiggyBank();
+  const { timeRemaining } = useTimelock(unlockTime);
+  const { error: showError } = useSecureAlert();
+  const isMobile = useMobile();
+  const [secureAmount, setSecureAmount] = useState('');
+  const [amountValid, setAmountValid] = useState(false);
+  const [validationError, setValidationError] = useState('');
 
   // Notify parent component of amount changes
   useEffect(() => {
@@ -36,60 +31,51 @@ export function DepositForm({ onAmountChange }: DepositFormProps) {
 
   useEffect(() => {
     if (isSuccess) {
-      setAmount('')
-      setSecureAmount('')
-      setAmountValid(false)
-      setValidationError('')
-      refetchBalance()
+      setAmount('');
+      setSecureAmount('');
+      setAmountValid(false);
+      setValidationError('');
+      refetchBalance();
     }
-  }, [isSuccess, refetchBalance, setAmount])
+  }, [isSuccess, refetchBalance]);
 
   const handleAmountChange = (value: string, isValid: boolean) => {
-    setSecureAmount(value)
-    setAmountValid(isValid)
-    setValidationError('')
-    
+    setSecureAmount(value);
+    setAmountValid(isValid);
+    setValidationError('');
+
     if (isValid && value) {
-      setAmount(value)
+      setAmount(value);
     } else {
-      setAmount('')
+      setAmount('');
     }
-  }
+  };
 
   const handleDeposit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!secureAmount || !amountValid) {
-      setValidationError('Please enter a valid amount')
+      setValidationError('Please enter a valid amount');
       showError('Invalid Amount', VALIDATION.INVALID_AMOUNT);
       return;
     }
 
-    const numAmount = parseFloat(secureAmount)
+    const numAmount = parseFloat(secureAmount);
     if (isNaN(numAmount) || numAmount <= 0) {
-      setValidationError('Amount must be greater than 0')
+      setValidationError('Amount must be greater than 0');
       showError('Invalid Amount', VALIDATION.INVALID_AMOUNT);
       return;
     }
 
     // Additional security check - validate ETH amount using security utils
-    const ethValidation = validateEthAmount(secureAmount)
+    const ethValidation = validateEthAmount(secureAmount);
     if (!ethValidation.isValid) {
-      setValidationError(ethValidation.errors.join(', '))
+      setValidationError(ethValidation.errors.join(', '));
       showError('Invalid Amount', 'Security validation failed');
       return;
     }
 
     deposit(secureAmount);
-
-  const handleDeposit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!amount || parseFloat(amount) <= 0) {
-      showError('Invalid Amount', VALIDATION.INVALID_AMOUNT);
-      return;
-    }
-    
-    deposit(validation.value);
   };
 
   const formatLockInfo = () => {
@@ -159,5 +145,5 @@ export function DepositForm({ onAmountChange }: DepositFormProps) {
         </div>
       )}
     </form>
-  )
+  );
 }
