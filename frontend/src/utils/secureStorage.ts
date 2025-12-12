@@ -3,6 +3,8 @@
  * Replaces unsafe direct localStorage usage to prevent XSS attacks
  */
 
+import { VALIDATION } from '../constants/appConstants';
+
 export interface StorageData {
   [key: string]: unknown;
 }
@@ -27,7 +29,7 @@ function sanitizeInput(input: string): string {
       return entities[match];
     })
     .trim()
-    .substring(0, 100); // Limit length
+    .substring(0, VALIDATION.MAX_INPUT_LENGTH); // Limit length
 }
 
 /**
@@ -39,7 +41,7 @@ function validateJSONStructure(data: unknown): boolean {
   }
 
   // For arrays, ensure they're not too large
-  if (Array.isArray(data) && data.length > 100) {
+  if (Array.isArray(data) && data.length > VALIDATION.MAX_ARRAY_SIZE) {
     return false;
   }
 
@@ -150,7 +152,7 @@ export function secureClear(): boolean {
  */
 function validateStorageKey(key: string): boolean {
   // Only allow alphanumeric characters, hyphens, underscores, and dots
-  return /^[a-zA-Z0-9._-]+$/.test(key) && key.length <= 50;
+  return /^[a-zA-Z0-9._-]+$/.test(key) && key.length <= VALIDATION.MAX_STORAGE_KEY_LENGTH;
 }
 
 /**

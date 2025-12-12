@@ -3,6 +3,8 @@
  * Comprehensive security functions for input validation, XSS prevention, and safe data handling
  */
 
+import { VALIDATION } from '../constants/appConstants';
+
 export interface ValidationResult {
   isValid: boolean
   errors: string[]
@@ -69,7 +71,7 @@ export function sanitizeInput(
   config: SecurityConfig = {}
 ): ValidationResult {
   const {
-    maxLength = 1000,
+    maxLength = VALIDATION.MAX_INPUT_LENGTH,
     allowedChars,
     disallowedPatterns = [
       SECURITY_PATTERNS.XSS_SCRIPT,
@@ -165,9 +167,9 @@ export function sanitizeInput(
  * Validate email address
  */
 export function validateEmail(email: string): ValidationResult {
-  const result = sanitizeInput(email, { 
-    maxLength: 254, // RFC 5321 limit
-    allowedChars: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ 
+  const result = sanitizeInput(email, {
+    maxLength: VALIDATION.MAX_EMAIL_LENGTH, // RFC 5321 limit
+    allowedChars: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   })
 
   if (!result.isValid) {
@@ -192,9 +194,9 @@ export function validateEmail(email: string): ValidationResult {
  * Validate URL for security
  */
 export function validateUrl(url: string): ValidationResult {
-  const result = sanitizeInput(url, { 
-    maxLength: 2048,
-    strictMode: true 
+  const result = sanitizeInput(url, {
+    maxLength: VALIDATION.MAX_URL_LENGTH,
+    strictMode: true
   })
 
   if (!result.isValid) {
@@ -364,7 +366,7 @@ export function safeHtml(html: string): string {
  * Generate CSRF token
  */
 export function generateCSRFToken(): string {
-  const array = new Uint8Array(32)
+  const array = new Uint8Array(VALIDATION.CSRF_TOKEN_LENGTH)
   crypto.getRandomValues(array)
   return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('')
 }
@@ -423,9 +425,9 @@ export function detectMaliciousContent(content: string): {
 
   // Determine risk level
   let riskLevel: 'low' | 'medium' | 'high' = 'low'
-  if (score >= 15) {
+  if (score >= VALIDATION.CRITICAL_ALERT_THRESHOLD) {
     riskLevel = 'high'
-  } else if (score >= 8) {
+  } else if (score >= VALIDATION.MEDIUM_ALERT_THRESHOLD) {
     riskLevel = 'medium'
   }
 
@@ -439,7 +441,7 @@ export function detectMaliciousContent(content: string): {
 /**
  * Secure random string generation
  */
-export function generateSecureId(length: number = 16): string {
+export function generateSecureId(length: number = VALIDATION.SECURE_ID_DEFAULT_LENGTH): string {
   const array = new Uint8Array(length)
   crypto.getRandomValues(array)
   return Array.from(array, byte => (byte % 36).toString(36)).join('')
@@ -451,7 +453,7 @@ export function generateSecureId(length: number = 16): string {
 class RateLimiter {
   private attempts = new Map<string, { count: number; resetTime: number }>()
   
-  isAllowed(key: string, maxAttempts: number = 5, windowMs: number = 60000): boolean {
+  isAllowed(key: string, maxAttempts: number = VALIDATION.RATE_LIMIT_DEFAULT_ATTEMPTS, windowMs: number = VALIDATION.RATE_LIMIT_DEFAULT_WINDOW): boolean {
     const now = Date.now()
     const record = this.attempts.get(key)
     

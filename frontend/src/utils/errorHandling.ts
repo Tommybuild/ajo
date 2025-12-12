@@ -3,6 +3,8 @@
  * Centralized error handling for the application
  */
 
+import { VALIDATION } from '../constants/appConstants';
+
 export interface AppError extends Error {
   readonly id: string
   readonly timestamp: Date
@@ -17,7 +19,7 @@ export class ErrorHandler {
   private static instance: ErrorHandler
   private errorListeners: Array<(error: AppError) => void> = []
   private errorHistory: AppError[] = []
-  private maxHistorySize = 50
+  private maxHistorySize = VALIDATION.MAX_ERROR_HISTORY
 
   static getInstance(): ErrorHandler {
     if (!ErrorHandler.instance) {
@@ -250,7 +252,7 @@ export function useErrorHandler() {
 
   useEffect(() => {
     const unsubscribe = errorHandler.subscribe((error) => {
-      setErrors(prev => [error, ...prev].slice(0, 10)) // Keep only last 10 errors
+      setErrors(prev => [error, ...prev].slice(0, VALIDATION.MAX_ERROR_DISPLAY)) // Keep only last 10 errors
     })
 
     return unsubscribe

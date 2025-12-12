@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { markPerformanceStart, getPerformanceMetrics, recordAdvancedMetric } from '../utils/performance';
+import { VALIDATION } from '../constants/appConstants';
 
 interface PerformanceMonitorOptions {
   componentName: string;
@@ -95,7 +96,7 @@ export function usePerformanceMonitor(options: PerformanceMonitorOptions) {
       stats.averageRenderTime = stats.totalRenderTime / stats.renderCount;
 
       // Track slow renders
-      const renderThreshold = thresholds.render || 16; // 60fps = 16.67ms
+      const renderThreshold = thresholds.render || VALIDATION.RENDER_THRESHOLD; // 60fps = 16.67ms
       if (renderTime > renderThreshold) {
         stats.slowRenders++;
         console.warn(`🐌 Slow render detected in ${componentName}: ${renderTime.toFixed(2)}ms (threshold: ${renderThreshold}ms)`);
@@ -121,7 +122,7 @@ export function usePerformanceMonitor(options: PerformanceMonitorOptions) {
       const stats = performanceStatsMap.get(componentName)!;
       stats.mountTime = mountTime;
 
-      const mountThreshold = thresholds.mount || 100;
+      const mountThreshold = thresholds.mount || VALIDATION.MOUNT_THRESHOLD;
       if (mountTime > mountThreshold) {
         console.warn(`🐌 Slow mount detected in ${componentName}: ${mountTime.toFixed(2)}ms (threshold: ${mountThreshold}ms)`);
       }
@@ -150,7 +151,7 @@ export function usePerformanceMonitor(options: PerformanceMonitorOptions) {
       const stats = performanceStatsMap.get(componentName)!;
       stats.propChanges += changedProps;
 
-      const propThreshold = thresholds.props || 50;
+      const propThreshold = thresholds.props || VALIDATION.PROP_CHANGE_THRESHOLD;
       if (changedProps > propThreshold) {
         console.warn(`🔄 Many prop changes in ${componentName}: ${changedProps} props changed (threshold: ${propThreshold})`);
       }
@@ -179,7 +180,7 @@ export function usePerformanceMonitor(options: PerformanceMonitorOptions) {
       const stats = performanceStatsMap.get(componentName)!;
       stats.stateChanges += changedState;
 
-      const stateThreshold = thresholds.state || 10;
+      const stateThreshold = thresholds.state || VALIDATION.STATE_CHANGE_THRESHOLD;
       if (changedState > stateThreshold) {
         console.warn(`🔄 Many state changes in ${componentName}: ${changedState} state values changed (threshold: ${stateThreshold})`);
       }
@@ -283,19 +284,19 @@ export function getPerformanceSummary(): {
       totalRenderTime += stats.averageRenderTime;
       totalRenders += stats.renderCount;
 
-      if (stats.averageRenderTime > 16 || stats.slowRenders > 0) {
+      if (stats.averageRenderTime > VALIDATION.RENDER_THRESHOLD || stats.slowRenders > 0) {
         slowComponents.push(componentName);
       }
-
-      if (stats.slowRenders > stats.renderCount * 0.1) {
+    
+      if (stats.slowRenders > stats.renderCount * VALIDATION.HIGH_RENDER_RATIO) {
         recommendations.push(`${componentName}: High number of slow renders (${stats.slowRenders}/${stats.renderCount}). Consider React.memo or useMemo.`);
       }
-
-      if (stats.propChanges > 50) {
+    
+      if (stats.propChanges > VALIDATION.PROP_CHANGE_THRESHOLD) {
         recommendations.push(`${componentName}: Many prop changes (${stats.propChanges}). Consider useMemo or React.memo.`);
       }
-
-      if (stats.stateChanges > 20) {
+    
+      if (stats.stateChanges > VALIDATION.STATE_CHANGE_THRESHOLD) {
         recommendations.push(`${componentName}: Many state changes (${stats.stateChanges}). Consider useReducer or split components.`);
       }
     }
@@ -307,7 +308,7 @@ export function getPerformanceSummary(): {
     recommendations.push('Consider implementing performance optimizations for slow-rendering components.');
   }
 
-  if (averageRenderTime > 16) {
+  if (averageRenderTime > VALIDATION.RENDER_THRESHOLD) {
     recommendations.push('Overall render performance is slow. Consider implementing React.memo, useMemo, or useCallback where appropriate.');
   }
 

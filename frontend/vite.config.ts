@@ -1,11 +1,13 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+import { NETWORK } from './src/constants/appConstants';
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3000,
+    port: NETWORK.DEFAULT_PORT,
     open: true, // Auto-open browser on start
   },
   define: {
@@ -31,7 +33,7 @@ export default defineConfig({
       },
     },
     // Increase chunk size warning limit for Web3 libraries
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: NETWORK.CHUNK_SIZE_WARNING_LIMIT,
     // Source maps for easier debugging
     sourcemap: true,
   },

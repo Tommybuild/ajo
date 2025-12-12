@@ -3,16 +3,14 @@
  * Provides centralized validation for user inputs throughout the application
  */
 
+import { sanitizeStringInput, validateNumericInput, validateEthereumAddressFormat, validateTransactionHashFormat, validateTimestampRange, createValidationSchema } from './sharedValidation';
+import { VALIDATION, REGEX_PATTERNS } from '../constants/appConstants';
+
 /**
  * Sanitizes a string by removing potentially dangerous characters
  */
 export function sanitizeString(input: string): string {
-  if (typeof input !== 'string') return '';
-  
-  return input
-    .trim()
-    .replace(/[<>'"&]/g, '') // Remove potentially dangerous characters
-    .substring(0, 1000); // Limit length
+  return sanitizeStringInput(input);
 }
 
 /**
@@ -24,34 +22,13 @@ export function validateEthAmount(input: string): { isValid: boolean; value: str
   }
 
   const sanitized = input.trim();
-  
-  // Check if it's a number
-  const amount = parseFloat(sanitized);
-  if (isNaN(amount)) {
-    return { isValid: false, value: '0', error: 'Please enter a valid number' };
+  const numericValidation = validateNumericInput(sanitized, 0, VALIDATION.MAX_ETH_AMOUNT, VALIDATION.MAX_DECIMAL_PLACES, 'Amount');
+
+  if (!numericValidation.isValid) {
+    return { isValid: false, value: '0', error: numericValidation.error };
   }
 
-  // Check if positive
-  if (amount <= 0) {
-    return { isValid: false, value: '0', error: 'Amount must be greater than 0' };
-  }
-
-  // Check if not too large (practical limits)
-  if (amount > 1000000) {
-    return { isValid: false, value: '0', error: 'Amount is too large' };
-  }
-
-  // Limit decimal places to 18 (Wei precision)
-  const decimalPlaces = sanitized.split('.')[1]?.length || 0;
-  if (decimalPlaces > 18) {
-    return { 
-      isValid: false, 
-      value: '0', 
-      error: 'Maximum 18 decimal places allowed' 
-    };
-  }
-
-  return { isValid: true, value: amount.toString() };
+  return { isValid: true, value: sanitized };
 }
 
 /**
@@ -63,11 +40,10 @@ export function validateAddress(address: string): { isValid: boolean; value: str
   }
 
   const sanitized = address.trim();
-  
-  // Check if it's a valid Ethereum address format
-  const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
-  if (!ethAddressRegex.test(sanitized)) {
-    return { isValid: false, value: '', error: 'Invalid Ethereum address format' };
+  const addressValidation = validateEthereumAddressFormat(sanitized, 'Address');
+
+  if (!addressValidation.isValid) {
+    return { isValid: false, value: '', error: addressValidation.error };
   }
 
   return { isValid: true, value: sanitized };
@@ -78,17 +54,15 @@ export function validateAddress(address: string): { isValid: boolean; value: str
  */
 export function validateTime(unixTime: string | number): { isValid: boolean; value: number; error?: string } {
   const time = typeof unixTime === 'string' ? parseInt(unixTime, 10) : unixTime;
-  
+
   if (isNaN(time)) {
     return { isValid: false, value: 0, error: 'Invalid time value' };
   }
 
-  // Check if time is in reasonable range (between 2020 and 2100)
-  const minTime = Date.UTC(2020, 0, 1) / 1000;
-  const maxTime = Date.UTC(2100, 0, 1) / 1000;
-  
-  if (time < minTime || time > maxTime) {
-    return { isValid: false, value: 0, error: 'Time must be between 2020 and 2100' };
+  const timestampValidation = validateTimestampRange(time, VALIDATION.MIN_TIMESTAMP, VALIDATION.MAX_TIMESTAMP, 'Time');
+
+  if (!timestampValidation.isValid) {
+    return { isValid: false, value: 0, error: timestampValidation.error };
   }
 
   return { isValid: true, value: time };
@@ -103,12 +77,12 @@ export function validateName(name: string): { isValid: boolean; value: string; e
   }
 
   const sanitized = sanitizeString(name);
-  
+
   if (sanitized.length === 0) {
     return { isValid: false, value: '', error: 'Name cannot be empty' };
   }
 
-  if (sanitized.length > 100) {
+  if (sanitized.length > VALIDATION.MAX_NAME_LENGTH) {
     return { isValid: false, value: '', error: 'Name is too long (max 100 characters)' };
   }
 
@@ -124,11 +98,10 @@ export function validateTransactionHash(hash: string): { isValid: boolean; value
   }
 
   const sanitized = hash.trim();
-  
-  // Check if it's a valid transaction hash format
-  const txHashRegex = /^0x[a-fA-F0-9]{64}$/;
-  if (!txHashRegex.test(sanitized)) {
-    return { isValid: false, value: '', error: 'Invalid transaction hash format' };
+  const hashValidation = validateTransactionHashFormat(sanitized, 'Transaction hash');
+
+  if (!hashValidation.isValid) {
+    return { isValid: false, value: '', error: hashValidation.error };
   }
 
   return { isValid: true, value: sanitized };
@@ -150,35 +123,17 @@ export function createValidationSchema<T extends Record<string, any>>(
   data: T,
   rules: Partial<Record<keyof T, (value: any) => ValidationResult<any>>>
 ): { isValid: boolean; data: T; errors: Record<string, string> } {
-  const errors: Record<string, string> = {};
-  const validatedData = { ...data };
-
-  for (const [key, rule] of Object.entries(rules)) {
-    if (rule) {
-      const result = rule(data[key as keyof T]);
-      if (!result.isValid) {
-        errors[key] = result.error || 'Validation failed';
-      } else {
-        validatedData[key as keyof T] = result.value;
-      }
-    }
-  }
-
-  return {
-    isValid: Object.keys(errors).length === 0,
-    data: validatedData,
-    errors
-  };
+  return createValidationSchema(data, rules);
 }
 
 /**
  * Common validation patterns
  */
 export const VALIDATION_PATTERNS = {
-  ETH_AMOUNT: /^\d*\.?\d*$/,
-  HEX_ADDRESS: /^0x[a-fA-F0-9]{40}$/,
-  TRANSACTION_HASH: /^0x[a-fA-F0-9]{64}$/,
-  NUMBER: /^\d+$/,
+  ETH_AMOUNT: REGEX_PATTERNS.ETH_AMOUNT,
+  HEX_ADDRESS: REGEX_PATTERNS.HEX_ADDRESS,
+  TRANSACTION_HASH: REGEX_PATTERNS.TRANSACTION_HASH,
+  NUMBER: REGEX_PATTERNS.NUMBER,
 } as const;
 
 /**

@@ -2,6 +2,7 @@ import { useAccount, useReadContract, useWriteContract, useWaitForTransactionRec
 import { parseEther } from 'viem'
 import { useMemo, useCallback, useRef, useEffect } from 'react'
 import { PIGGYBANK_ABI, PIGGYBANK_ADDRESS } from '../config/contracts'
+import { TIME } from '../constants/appConstants'
 
 interface Transaction {
   id: string;
@@ -50,7 +51,7 @@ export function usePiggyBank() {
     refetchTimeoutRef.current = setTimeout(() => {
       refetchBalance()
       refetchTimeoutRef.current = null
-    }, 1000) // 1 second debounce
+    }, TIME.DEBOUNCE_DELAY) // 1 second debounce
   }, [refetchBalance])
 
   // Cleanup timeout on unmount

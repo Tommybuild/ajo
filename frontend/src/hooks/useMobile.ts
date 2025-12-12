@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { VALIDATION } from '../constants/appConstants'
 
 /**
  * Custom hook for mobile device detection and responsive behavior
@@ -16,8 +17,8 @@ export function useMobile() {
       const width = window.innerWidth
       const height = window.innerHeight
       
-      setIsMobile(width <= 768)
-      setIsTablet(width > 768 && width <= 1024)
+      setIsMobile(width <= VALIDATION.MOBILE_BREAKPOINT)
+      setIsTablet(width > VALIDATION.MOBILE_BREAKPOINT && width <= VALIDATION.TABLET_BREAKPOINT)
       setScreenSize({ width, height })
     }
 
@@ -146,13 +147,13 @@ export function useKeyboardHeight() {
       if (!isActive) return
       
       // This is a simple heuristic for detecting mobile keyboard
-      const isMobile = window.innerWidth <= 768
+      const isMobile = window.innerWidth <= VALIDATION.MOBILE_BREAKPOINT
       if (isMobile) {
         const viewportHeight = window.visualViewport?.height || window.innerHeight
         const windowHeight = window.innerHeight
         const heightDiff = windowHeight - viewportHeight
         
-        setKeyboardHeight(heightDiff > 150 ? heightDiff : 0)
+        setKeyboardHeight(heightDiff > VALIDATION.KEYBOARD_HEIGHT_THRESHOLD ? heightDiff : 0)
       }
     }
 
@@ -209,11 +210,11 @@ export function usePullToRefresh(onRefresh: () => void) {
 
       if (pullDelta > 0 && window.scrollY === 0) {
         // Limit pull distance to 80px
-        const distance = Math.min(pullDelta, 80)
+        const distance = Math.min(pullDelta, VALIDATION.PULL_TO_REFRESH_THRESHOLD)
         setPullDistance(distance)
         
         // Prevent default scrolling behavior
-        if (distance > 10) {
+        if (distance > VALIDATION.PULL_TO_REFRESH_PREVENT_SCROLL) {
           e.preventDefault()
         }
       }
@@ -222,7 +223,7 @@ export function usePullToRefresh(onRefresh: () => void) {
     const handleTouchEnd = () => {
       if (!isActive || !canPull || isRefreshing) return
 
-      if (pullDistance >= 80) {
+      if (pullDistance >= VALIDATION.PULL_TO_REFRESH_THRESHOLD) {
         setIsRefreshing(true)
         onRefresh()
         
