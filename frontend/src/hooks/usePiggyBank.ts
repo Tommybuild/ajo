@@ -87,20 +87,21 @@ export function usePiggyBank() {
     })
   }
 
-  // Admin functions
-  const { data: totalDeposits } = useReadContract({
-    address: PIGGYBANK_ABI,
-    abi: PIGGYBANK_ABI,
-    functionName: 'totalDeposits',
-    query: { enabled: !!address && address === owner },
-  })
+  // Admin functions - Note: These functions don't exist in the current contract
+  // They are included here as examples for potential future extensions
+  // const { data: totalDeposits } = useReadContract({
+  //   address: PIGGYBANK_ADDRESS,
+  //   abi: PIGGYBANK_ABI,
+  //   functionName: 'totalDeposits',
+  //   query: { enabled: !!address && address === owner },
+  // })
 
-  const { data: totalWithdrawals } = useReadContract({
-    address: PIGGYBANK_ABI,
-    abi: PIGGYBANK_ABI,
-    functionName: 'totalWithdrawals',
-    query: { enabled: !!address && address === owner },
-  })
+  // const { data: totalWithdrawals } = useReadContract({
+  //   address: PIGGYBANK_ADDRESS,
+  //   abi: PIGGYBANK_ABI,
+  //   functionName: 'totalWithdrawals',
+  //   query: { enabled: !!address && address === owner },
+  // })
 
   // In a real app, you would fetch real transaction data from an indexer or subgraph
   // For now, we'll return mock data
