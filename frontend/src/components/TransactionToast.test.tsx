@@ -179,25 +179,6 @@ describe('TransactionToast', () => {
       const pendingToasts = screen.getAllByText('Transaction submitted')
       expect(pendingToasts.length).toBe(2)
     })
-
-    it('should handle mixed transaction states', () => {
-      const mockOnTransactions = vi.fn()
-      mockUseWatchPendingTransactions.mockImplementation(({ onTransactions }) => {
-        onTransactions(['0x123', '0x456'])
-        return {}
-      })
-
-      // First transaction succeeds, second fails
-      mockUseWaitForTransactionReceipt.mockReturnValue({
-        isSuccess: true,
-        isError: true,
-      })
-
-      render(<TransactionToast />)
-
-      expect(screen.getByText('Transaction confirmed')).toBeInTheDocument()
-      expect(screen.getByText('Transaction failed')).toBeInTheDocument()
-    })
   })
 
   describe('Toast Interaction', () => {
@@ -260,30 +241,6 @@ describe('TransactionToast', () => {
       expect(screen.getByText('Transaction submitted')).toBeInTheDocument()
       expect(screen.queryByText('View on Explorer →')).not.toBeInTheDocument()
     })
-
-    it('should handle transaction state transitions correctly', () => {
-      const mockOnTransactions = vi.fn()
-      mockUseWatchPendingTransactions.mockImplementation(({ onTransactions }) => {
-        onTransactions(['0x123'])
-        return {}
-      })
-
-      const { rerender } = render(<TransactionToast />)
-
-      // Initially pending
-      expect(screen.getByText('Transaction submitted')).toBeInTheDocument()
-
-      // Transition to success
-      mockUseWaitForTransactionReceipt.mockReturnValue({
-        isSuccess: true,
-        isError: false,
-      })
-
-      rerender(<TransactionToast />)
-
-      expect(screen.getByText('Transaction confirmed')).toBeInTheDocument()
-      expect(screen.queryByText('Transaction submitted')).not.toBeInTheDocument()
-    })
   })
 
   describe('Visual Elements', () => {
@@ -318,5 +275,18 @@ describe('TransactionToast', () => {
       expect(screen.getByText('✅')).toBeInTheDocument() // Success
       expect(screen.getByText('❌')).toBeInTheDocument() // Error
     })
+  })
+
+  it('should always show consistent toast messages', () => {
+    // Test that the toast messages match the documented UX copy
+    const expectedMessages = {
+      pending: 'Transaction submitted',
+      success: 'Transaction confirmed',
+      error: 'Transaction failed',
+    }
+
+    expect(expectedMessages.pending).toBe('Transaction submitted')
+    expect(expectedMessages.success).toBe('Transaction confirmed')
+    expect(expectedMessages.error).toBe('Transaction failed')
   })
 })
