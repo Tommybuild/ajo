@@ -38,10 +38,17 @@ export function SecurePrompt({
     return input
       .replace(/[<>'"&]/g, (match) => {
         const entities: Record<string, string> = {
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;',
+          '&': '&amp;',
+        };
+        return entities[match];
+        const entities: Record<string, string> = {
           '<': '<',
           '>': '>',
           '"': '"',
-          "'": '&#39;',
           "'": ''',
           '&': '&',
         };
