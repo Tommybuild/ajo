@@ -6,20 +6,29 @@ import { formatLockTime } from '../constants/uxCopy';
 
 export function DepositForm() {
   const [amount, setAmount] = useState('')
+  const [showError, setShowError] = useState<string | null>(null)
   const { deposit, isPending, isConfirming, isSuccess, refetchBalance, unlockTime } = usePiggyBank()
   const { timeRemaining } = useTimelock(unlockTime)
 
   useEffect(() => {
     if (isSuccess) {
       setAmount('')
+      setShowError(null)
       refetchBalance()
     }
   }, [isSuccess, refetchBalance])
 
   const handleDeposit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount || parseFloat(amount) <= 0) {
-      alert(VALIDATION.INVALID_AMOUNT);
+    const numAmount = parseFloat(amount)
+    if (!amount || isNaN(numAmount) || numAmount <= 0) {
+      setShowError(VALIDATION.INVALID_AMOUNT)
+      setTimeout(() => setShowError(null), 5000)
+      return;
+    }
+    if (numAmount > 100) {
+      setShowError('Amount exceeds maximum deposit limit of 100 ETH')
+      setTimeout(() => setShowError(null), 5000)
       return;
     }
     deposit(amount);
@@ -81,6 +90,12 @@ export function DepositForm() {
           ? 'Deposited!'
           : BUTTONS.DEPOSIT_ETH}
       </button>
+
+      {showError && (
+        <div className="error-message" style={{ color: 'red', marginTop: '10px' }}>
+          ❌ {showError}
+        </div>
+      )}
 
       {isSuccess && (
         <div className="success-message">
