@@ -11,16 +11,16 @@ contract PiggyBank {
     address public owner;
     uint256 public unlockTime;
     bool public paused;
-    
+
     // Multi-user deposit tracking
     mapping(address => uint256) public deposits;
     uint256 public totalDeposits;
     uint256 public totalWithdrawals;
-    
+
     // Deposit limits
     uint256 public constant MAX_DEPOSIT_AMOUNT = 100 ether;
     uint256 public constant MIN_DEPOSIT_AMOUNT = 0.001 ether;
-    
+
     // Custom errors for gas efficiency
     error PiggyBank__DepositTooHigh();
     error PiggyBank__DepositTooLow();
@@ -28,12 +28,25 @@ contract PiggyBank {
     error PiggyBank__StillLocked();
     error PiggyBank__NotOwner();
     error PiggyBank__ZeroAddress();
+    error PiggyBank__ZeroAmount();
+    error PiggyBank__InsufficientBalance();
 
-    event Deposited(address indexed depositor, uint256 amount, uint256 timestamp);
-    event Withdrawn(address indexed withdrawer, uint256 amount, uint256 timestamp);
+    event Deposited(
+        address indexed depositor,
+        uint256 amount,
+        uint256 timestamp
+    );
+    event Withdrawn(
+        address indexed withdrawer,
+        uint256 amount,
+        uint256 timestamp
+    );
     event Paused(address account);
     event Unpaused(address account);
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event OwnershipTransferred(
+        address indexed previousOwner,
+        address indexed newOwner
+    );
 
     constructor(uint256 _unlockTime) payable {
         require(_unlockTime > block.timestamp, "Unlock time must be in future");
@@ -81,18 +94,18 @@ contract PiggyBank {
     function deposit() external payable whenNotPaused {
         // Checks
         if (msg.value < MIN_DEPOSIT_AMOUNT) revert PiggyBank__DepositTooLow();
-        
+
         uint256 userDeposit = deposits[msg.sender];
         uint256 newTotalDeposit = userDeposit + msg.value;
-        
+
         if (newTotalDeposit > MAX_DEPOSIT_AMOUNT) {
             revert PiggyBank__DepositTooHigh();
         }
-        
+
         // Effects - Update state BEFORE external calls
         deposits[msg.sender] = newTotalDeposit;
         totalDeposits += msg.value;
-        
+
         // Interactions - Emit event (no external calls here)
         emit Deposited(msg.sender, msg.value, block.timestamp);
     }
@@ -105,18 +118,18 @@ contract PiggyBank {
     function withdraw(uint256 amount) external whenNotPaused {
         // Checks
         if (block.timestamp < unlockTime) revert PiggyBank__StillLocked();
-        
+
         uint256 userDeposit = deposits[msg.sender];
-        if (amount == 0) revert PiggyBank__DepositTooLow();
-        if (amount > userDeposit) revert PiggyBank__DepositTooHigh();
-        
+        if (amount == 0) revert PiggyBank__ZeroAmount();
+        if (amount > userDeposit) revert PiggyBank__InsufficientBalance();
+
         // Effects - Update state BEFORE external calls
         deposits[msg.sender] = userDeposit - amount;
         totalWithdrawals += amount;
-        
+
         // Interactions - Emit event first, then external call
         emit Withdrawn(msg.sender, amount, block.timestamp);
-        
+
         // External call at the END to prevent reentrancy
         (bool success, ) = payable(msg.sender).call{value: amount}("");
         if (!success) revert PiggyBank__TransferFailed();
@@ -129,17 +142,17 @@ contract PiggyBank {
     function withdrawAll() external whenNotPaused {
         // Checks
         if (block.timestamp < unlockTime) revert PiggyBank__StillLocked();
-        
+
         uint256 userDeposit = deposits[msg.sender];
         if (userDeposit == 0) revert PiggyBank__DepositTooLow();
-        
+
         // Effects - Update state BEFORE external calls
         deposits[msg.sender] = 0;
         totalWithdrawals += userDeposit;
-        
+
         // Interactions - Emit event first, then external call
         emit Withdrawn(msg.sender, userDeposit, block.timestamp);
-        
+
         // External call at the END to prevent reentrancy
         (bool success, ) = payable(msg.sender).call{value: userDeposit}("");
         if (!success) revert PiggyBank__TransferFailed();
@@ -173,7 +186,11 @@ contract PiggyBank {
      * @return totalWithdrawals Total amount withdrawn
      * @return currentBalance Current contract balance
      */
-    function getContractStats() external view returns (uint256, uint256, uint256) {
+    function getContractStats()
+        external
+        view
+        returns (uint256, uint256, uint256)
+    {
         return (totalDeposits, totalWithdrawals, address(this).balance);
     }
 }
