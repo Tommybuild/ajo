@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useWatchContractEvent } from 'wagmi'
 import { parseEther } from 'viem'
 import { PIGGYBANK_ABI, PIGGYBANK_ADDRESS } from '../config/contracts'
@@ -13,6 +14,7 @@ interface Transaction {
 export function usePiggyBank() {
   const { address } = useAccount()
   const { writeContract, data: hash, isPending } = useWriteContract()
+  const [transactions, setTransactions] = useState<Transaction[]>([])
 
   // Read balance
   const { data: balance, refetch: refetchBalance } = useReadContract({
@@ -29,6 +31,19 @@ export function usePiggyBank() {
     onLogs(logs) {
       // Automatically refetch balance when deposit event is detected
       refetchBalance()
+      
+      // Add deposit transactions to history
+      logs.forEach((log) => {
+        const { depositor, amount, timestamp } = log.args
+        const newTransaction: Transaction = {
+          id: `${log.blockNumber}-${log.logIndex}`,
+          amount: Number(amount) / 1e18, // Convert from wei to ETH
+          timestamp: Number(timestamp),
+          type: 'deposit',
+          user: depositor as string,
+        }
+        setTransactions(prev => [newTransaction, ...prev].slice(0, 50)) // Keep last 50 transactions
+      })
     },
   })
 
@@ -40,6 +55,19 @@ export function usePiggyBank() {
     onLogs(logs) {
       // Automatically refetch balance when withdrawal event is detected
       refetchBalance()
+      
+      // Add withdrawal transactions to history
+      logs.forEach((log) => {
+        const { withdrawer, amount, timestamp } = log.args
+        const newTransaction: Transaction = {
+          id: `${log.blockNumber}-${log.logIndex}`,
+          amount: Number(amount) / 1e18, // Convert from wei to ETH
+          timestamp: Number(timestamp),
+          type: 'withdrawal',
+          user: withdrawer as string,
+        }
+        setTransactions(prev => [newTransaction, ...prev].slice(0, 50)) // Keep last 50 transactions
+      })
     },
   })
 
@@ -109,9 +137,7 @@ export function usePiggyBank() {
   const totalDeposits = contractStats?.[0]
   const totalWithdrawals = contractStats?.[1]
 
-  // Note: Transaction history implementation would require integration with
-  // event indexers or subgraph queries for complete transaction tracking
-  const transactions: Transaction[] = []
+
 
   return {
     balance,
