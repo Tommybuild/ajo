@@ -3,6 +3,7 @@ import { usePiggyBank } from '../hooks/usePiggyBank';
 import { useTimelock } from '../hooks/useTimelock';
 import { BUTTONS, LABELS, MESSAGES, VALIDATION } from '../constants/uxCopy';
 import { formatLockTime } from '../constants/uxCopy';
+import { MAX_DEPOSIT_AMOUNT, MIN_DEPOSIT_AMOUNT } from '../config/contracts';
 
 export function DepositForm() {
   const [amount, setAmount] = useState('')
@@ -26,8 +27,13 @@ export function DepositForm() {
       setTimeout(() => setShowError(null), 5000)
       return;
     }
-    if (numAmount > 100) {
-      setShowError('Amount exceeds maximum deposit limit of 100 ETH')
+    if (numAmount > MAX_DEPOSIT_AMOUNT) {
+      setShowError(`Amount exceeds maximum deposit limit of ${MAX_DEPOSIT_AMOUNT} ETH`)
+      setTimeout(() => setShowError(null), 5000)
+      return;
+    }
+    if (numAmount < MIN_DEPOSIT_AMOUNT) {
+      setShowError(`Minimum deposit amount is ${MIN_DEPOSIT_AMOUNT} ETH`)
       setTimeout(() => setShowError(null), 5000)
       return;
     }
