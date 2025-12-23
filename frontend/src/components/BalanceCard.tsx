@@ -24,7 +24,7 @@ export function BalanceCard() {
       <div className="balance-info">
         <h3 id="balance-card-title">Total Balance</h3>
         <div className="balance-amount" aria-live="polite" aria-label={`Current balance: ${balance ? formatEther(balance) : '0.00'} ETH`}>
-          {balance ? formatEther(balance) : '0.00'} ETH
+          {balance !== undefined ? formatEther(balance) : '0.00'} ETH
         </div>
       </div>
 

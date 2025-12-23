@@ -134,8 +134,8 @@ export function usePiggyBank() {
   })
 
   // Extract individual values from contractStats tuple
-  const totalDeposits = contractStats?.[0]
-  const totalWithdrawals = contractStats?.[1]
+  const totalDeposits = contractStats && contractStats.length >= 3 ? contractStats[0] : undefined
+  const totalWithdrawals = contractStats && contractStats.length >= 3 ? contractStats[1] : undefined
 
 
 
