@@ -30,6 +30,7 @@ contract PiggyBank {
     error PiggyBank__ZeroAddress();
     error PiggyBank__ZeroAmount();
     error PiggyBank__InsufficientBalance();
+    error PiggyBank__NoDeposit();
 
     event Deposited(
         address indexed depositor,
@@ -144,7 +145,7 @@ contract PiggyBank {
         if (block.timestamp < unlockTime) revert PiggyBank__StillLocked();
 
         uint256 userDeposit = deposits[msg.sender];
-        if (userDeposit == 0) revert PiggyBank__DepositTooLow();
+        if (userDeposit == 0) revert PiggyBank__NoDeposit();
 
         // Effects - Update state BEFORE external calls
         deposits[msg.sender] = 0;
