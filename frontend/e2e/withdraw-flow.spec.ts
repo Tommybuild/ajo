@@ -49,8 +49,7 @@ test.describe('Withdraw Flow', () => {
 
     // Mock the transaction confirmation
     await page.evaluate(() => {
-      // @ts-ignore
-      window.confirm = () => true;
+      ;(window as any).confirm = () => true;
     });
 
     // Click withdraw button
@@ -63,9 +62,8 @@ test.describe('Withdraw Flow', () => {
   test('should show locked state when funds are locked', async ({ page }) => {
     // Update mock to show locked state
     await page.evaluate(() => {
-      // @ts-ignore
-      window.piggyBankContract = {
-        ...window.piggyBankContract,
+      ;(window as any).piggyBankContract = {
+        ...(window as any).piggyBankContract,
         unlockTime: () => Math.floor(Date.now() / 1000) + 3600, // 1 hour in the future
       };
     });
