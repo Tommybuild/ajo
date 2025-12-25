@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAccount, useBalance, useDisconnect } from 'wagmi'
 import { formatEther } from 'viem'
+// Using simple inline symbols instead of Heroicons to avoid an extra dependency in tests
 
 // Network explorer URLs mapping
 const NETWORK_EXPLORERS = {
@@ -10,7 +11,7 @@ const NETWORK_EXPLORERS = {
   11155111: 'https://sepolia.etherscan.io', // Ethereum Sepolia
   137: 'https://polygonscan.com',        // Polygon Mainnet
   80001: 'https://mumbai.polygonscan.com', // Polygon Mumbai
-} as const
+}
 
 export function WalletInfo() {
   const { address, isConnected, chain } = useAccount()
@@ -72,9 +73,9 @@ export function WalletInfo() {
             aria-label="Copy to clipboard"
           >
             {copied ? (
-              <span style={{ color: 'var(--success)', fontSize: '0.875rem' }}>✓</span>
+              <span className="h-5 w-5 text-green-500">✓</span>
             ) : (
-              <span style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>📋</span>
+              <span className="h-5 w-5 text-gray-400">📋</span>
             )}
             <span className="tooltip">{copied ? 'Copied!' : 'Copy'}</span>
           </button>
