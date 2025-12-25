@@ -4,10 +4,10 @@
 
 import { createPublicClient, http, getAddress, isAddress, getContract } from 'viem'
 import { base, baseSepolia } from '@reown/appkit/networks'
-import { 
-  BlockchainConnectionStatus, 
-  ContractStatus, 
-  EnvironmentFlags, 
+import type {
+  BlockchainConnectionStatus,
+  ContractStatus,
+  EnvironmentFlags,
   TransactionStatus,
   DiagnosticsData,
   DiagnosticsError,
@@ -15,7 +15,6 @@ import {
   ContractEvent
 } from '../types/diagnostics'
 import { PIGGYBANK_ABI, PIGGYBANK_ADDRESS, CHAIN_ID } from '../config/contracts'
-import { wagmiAdapter } from '../config/wagmi'
 
 /**
  * Get current network information
