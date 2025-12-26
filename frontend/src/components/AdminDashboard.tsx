@@ -2,14 +2,6 @@ import { useState } from 'react';
 import { usePiggyBank } from '../hooks/usePiggyBank';
 import { formatEther } from 'viem';
 
-interface Transaction {
-  id: string;
-  amount: number;
-  timestamp: number;
-  type: 'deposit' | 'withdrawal';
-  user: string;
-}
-
 export function AdminDashboard() {
   const [showAll, setShowAll] = useState(false);
   const { balance, totalDeposits, totalWithdrawals, transactions } = usePiggyBank();
@@ -70,7 +62,7 @@ export function AdminDashboard() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {displayedTransactions.length > 0 ? (
-                displayedTransactions.map((tx, index) => (
+                displayedTransactions.map((tx) => (
                   <tr key={tx.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
