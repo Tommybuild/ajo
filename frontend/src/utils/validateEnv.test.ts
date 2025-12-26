@@ -311,7 +311,7 @@ describe('validateEnvironment', () => {
       mockImportMeta.env.VITE_REOWN_PROJECT_ID = ''
       mockImportMeta.env.VITE_PIGGYBANK_ADDRESS = ''
       
-      const result = validateEnvironment()
+      validateEnvironment()
       
       expect(consoleErrorSpy).toHaveBeenCalled()
       expect(consoleWarnSpy).not.toHaveBeenCalled()
@@ -326,7 +326,7 @@ describe('validateEnvironment', () => {
       mockImportMeta.env.VITE_REOWN_PROJECT_ID = '12345678901234567890123456789012'
       mockImportMeta.env.VITE_PIGGYBANK_ADDRESS = ''
       
-      const result = validateEnvironment()
+      validateEnvironment()
       
       expect(consoleErrorSpy).not.toHaveBeenCalled()
       expect(consoleWarnSpy).toHaveBeenCalled()
@@ -341,7 +341,7 @@ describe('validateEnvironment', () => {
       mockImportMeta.env.VITE_REOWN_PROJECT_ID = '12345678901234567890123456789012'
       mockImportMeta.env.VITE_PIGGYBANK_ADDRESS = '0x1234567890123456789012345678901234567890'
       
-      const result = validateEnvironment()
+      validateEnvironment()
       
       expect(consoleErrorSpy).not.toHaveBeenCalled()
       expect(consoleWarnSpy).not.toHaveBeenCalled()
