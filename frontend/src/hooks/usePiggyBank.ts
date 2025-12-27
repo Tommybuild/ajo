@@ -102,27 +102,20 @@ export function usePiggyBank() {
     })
   }
 
-  // Withdraw function
-  const withdraw = (amount: string) => {
+  // Withdraw function (owner-only, withdraws entire contract balance)
+  const withdraw = () => {
     if (!address) return
 
     writeContract({
       address: PIGGYBANK_ADDRESS,
       abi: PIGGYBANK_ABI,
       functionName: 'withdraw',
-      args: [parseEther(amount)],
     })
   }
 
-  // Withdraw all function
+  // Withdraw all alias — forwards to owner withdraw
   const withdrawAll = () => {
-    if (!address) return
-
-    writeContract({
-      address: PIGGYBANK_ADDRESS,
-      abi: PIGGYBANK_ABI,
-      functionName: 'withdrawAll',
-    })
+    withdraw()
   }
 
   // Get contract statistics using the aggregated function
