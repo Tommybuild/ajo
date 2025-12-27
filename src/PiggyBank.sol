@@ -90,6 +90,7 @@ contract PiggyBank {
     }
 
     modifier onlyOwner() {
+        require(msg.sender == owner, "PiggyBank: Not owner");
         if (msg.sender != owner) revert PiggyBank__Unauthorized();
         _;
     }
@@ -153,14 +154,13 @@ contract PiggyBank {
      */
     function deposit() external payable whenNotPaused {
         // Checks
-        if (msg.value < MIN_DEPOSIT_AMOUNT) revert PiggyBank__DepositTooLow();
+        require(msg.value > 0, "Must deposit something");
+        require(msg.value >= MIN_DEPOSIT_AMOUNT, "Deposit too small");
 
         uint256 userDeposit = deposits[msg.sender];
         uint256 newTotalDeposit = userDeposit + msg.value;
 
-        if (newTotalDeposit > MAX_DEPOSIT_AMOUNT) {
-            revert PiggyBank__DepositTooHigh();
-        }
+        require(newTotalDeposit <= MAX_DEPOSIT_AMOUNT, "Deposit exceeds max");
 
         // Effects - Update state BEFORE external calls
         deposits[msg.sender] = newTotalDeposit;
@@ -174,21 +174,22 @@ contract PiggyBank {
      * @dev Withdraws ETH from the piggy bank with enhanced security
      * @custom:gas Uses safe withdrawal pattern with reentrancy protection
      */
-    function withdraw(uint256 amount) external whenNotPaused {
-        // Checks
-        if (block.timestamp < unlockTime) revert PiggyBank__StillLocked();
+    /**
+     * @notice Owner withdraws entire contract balance after unlock
+     */
+    function withdraw() external onlyOwner whenNotPaused {
+        require(block.timestamp >= unlockTime, "PiggyBank: Still locked");
 
-        uint256 userDeposit = deposits[msg.sender];
-        if (amount == 0) revert PiggyBank__ZeroAmount();
-        if (amount > userDeposit) revert PiggyBank__InsufficientBalance();
+        uint256 contractBalance = address(this).balance;
+        require(contractBalance > 0, "No balance");
 
-        // Effects - Update state BEFORE external calls
-        deposits[msg.sender] = userDeposit - amount;
-        totalWithdrawals += amount;
+        // Effects
+        totalWithdrawals += contractBalance;
 
-        // Interactions - Emit event first, then external call
-        emit Withdrawn(msg.sender, amount, block.timestamp);
-
+        // Interactions
+        emit Withdrawn(msg.sender, contractBalance, block.timestamp);
+        (bool success, ) = payable(msg.sender).call{value: contractBalance}("");
+        require(success, "Transfer failed");
         // External call at the END to prevent reentrancy
         (bool success, ) = payable(msg.sender).call{value: amount}("");
         if (!success) revert PiggyBank__TransferFailed();
@@ -201,6 +202,7 @@ contract PiggyBank {
      * @dev Emergency withdrawal function for guardians
      * @custom:security Requires emergency mode to be active
      */
+    // Removed per-user withdrawAll in favor of owner-managed withdraw()
     function withdrawAll() external whenNotPaused {
         // Checks
         if (block.timestamp < unlockTime) revert PiggyBank__StillLocked();
