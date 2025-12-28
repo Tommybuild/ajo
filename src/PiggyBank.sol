@@ -68,7 +68,7 @@ contract PiggyBank {
     }
 
     modifier onlyOwner() {
-        require(msg.sender == owner, "PiggyBank: Not owner");
+        require(msg.sender == owner, "Not owner");
         _;
     }
 
@@ -118,7 +118,8 @@ contract PiggyBank {
     /**
      * @notice Owner withdraws entire contract balance after unlock
      */
-    function withdraw() external onlyOwner whenNotPaused {
+    function withdraw() external whenNotPaused {
+        require(msg.sender == owner, "PiggyBank: Not owner");
         require(block.timestamp >= unlockTime, "PiggyBank: Still locked");
 
         uint256 contractBalance = address(this).balance;
