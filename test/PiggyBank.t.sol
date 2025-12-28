@@ -6,6 +6,12 @@ import "../src/PiggyBank.sol";
 
 contract PiggyBankTest is Test {
     PiggyBank public piggyBank;
+    // Declare events locally so tests can `emit` them for vm.expectEmit
+    event Deposited(address indexed depositor, uint256 amount);
+    event Withdrawn(address indexed withdrawer, uint256 amount);
+    event Paused(address account);
+    event Unpaused(address account);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     
     // Test users
     address owner;
