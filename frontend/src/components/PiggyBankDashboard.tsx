@@ -53,7 +53,6 @@ export function PiggyBankDashboard() {
           savedStates={savedStates}
           onLoadState={(state) => {
             // Handle loading a saved state
-            console.log('Loading state:', state)
             setShowSavedStates(false)
           }}
           onDeleteState={(id) => {
