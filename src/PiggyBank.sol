@@ -36,10 +36,7 @@ contract PiggyBank {
     event Withdrawn(address indexed withdrawer, uint256 amount);
     event Paused(address account);
     event Unpaused(address account);
-    event OwnershipTransferred(
-        address indexed previousOwner,
-        address indexed newOwner
-    );
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     constructor(uint256 _unlockTime) payable {
         require(_unlockTime > block.timestamp, "Unlock time must be in future");
@@ -122,7 +119,7 @@ contract PiggyBank {
 
         // Interactions
         emit Withdrawn(msg.sender, contractBalance);
-        (bool success, ) = payable(msg.sender).call{value: contractBalance}("");
+        (bool success,) = payable(msg.sender).call{value: contractBalance}("");
         require(success, "Transfer failed");
     }
 
@@ -160,11 +157,7 @@ contract PiggyBank {
      * @return totalWithdrawals Total amount withdrawn
      * @return currentBalance Current contract balance
      */
-    function getContractStats()
-        external
-        view
-        returns (uint256, uint256, uint256)
-    {
+    function getContractStats() external view returns (uint256, uint256, uint256) {
         return (totalDeposits, totalWithdrawals, address(this).balance);
     }
 }
