@@ -25,6 +25,7 @@ vi.mock('viem', () => ({
       owner: vi.fn(),
     },
   })),
+  getCode: vi.fn(),
   parseEther: vi.fn(),
   formatEther: vi.fn(),
 }))
