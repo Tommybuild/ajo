@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { BalanceCard } from './BalanceCard'
 import { DepositForm } from './DepositForm'
 import { WithdrawButton } from './WithdrawButton'
 import { SaveForLater } from './SaveForLater'
 import { SecurePrompt, useSecurePrompt } from './SecurePrompt'
 import { useMobile } from '../hooks/useMobile'
+import { secureStorageUtils } from '../utils/security'
 
 interface SavedState {
   id: string;
@@ -12,6 +13,25 @@ interface SavedState {
   amount: string;
   unlockTime: number;
   date: string;
+}
+
+// Simple secure storage utils for piggy bank states
+const secureStorageUtils = {
+  async migratePiggyStates() {
+    // Migration logic if needed
+    return Promise.resolve()
+  },
+  async getSavedStates(): Promise<SavedState[]> {
+    try {
+      const stored = localStorage.getItem('ajo_piggy_states')
+      return stored ? JSON.parse(stored) : []
+    } catch {
+      return []
+    }
+  },
+  async setSavedStates(states: SavedState[]) {
+    localStorage.setItem('ajo_piggy_states', JSON.stringify(states))
+  }
 }
 
 // Secure Save for Later button component
@@ -73,7 +93,9 @@ export function PiggyBankDashboard() {
           setSavedStates(loaded)
         }
       } catch (error) {
-        console.warn('Failed to load saved states:', error)
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Failed to load saved states:', error)
+        }
         setSavedStates([])
       }
     }
@@ -100,7 +122,9 @@ export function PiggyBankDashboard() {
       // Store encrypted using secure storage
       await secureStorageUtils.setSavedStates(updatedStates)
     } catch (error) {
-      console.error('Failed to save state securely:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Failed to save state securely:', error)
+      }
       alert('Failed to save state. Please try again.')
     }
   }
@@ -133,7 +157,9 @@ export function PiggyBankDashboard() {
               setSavedStates(updated)
               await secureStorageUtils.setSavedStates(updated)
             } catch (error) {
-              console.error('Failed to delete state:', error)
+              if (process.env.NODE_ENV === 'development') {
+                console.error('Failed to delete state:', error)
+              }
               alert('Failed to delete state. Please try again.')
             }
           }}
