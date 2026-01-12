@@ -102,20 +102,21 @@ export function DepositForm({ onAmountChange }: DepositFormProps) {
     <form className="deposit-form" onSubmit={handleDeposit}>
       <div className="form-group">
         <SecureInput
-          id="amount"
-          label={LABELS.AMOUNT_ETH}
-          type="text"
-          value={secureAmount}
-          onChange={handleAmountChange}
-          validationType="amount"
-          placeholder={LABELS.AMOUNT_PLACEHOLDER}
-          maxLength={20}
-          securityMode="strict"
-          showValidation={true}
-          error={validationError}
-          helperText="Enter the amount of ETH to deposit"
-          disabled={isPending || isConfirming}
-        />
+id="amount"
+label={LABELS.AMOUNT_ETH}
+type="text"
+value={secureAmount}
+onChange={handleAmountChange}
+validationType="amount"
+placeholder={LABELS.AMOUNT_PLACEHOLDER}
+maxLength={20}
+securityMode="strict"
+showValidation={true}
+error={validationError}
+helperText="Enter the amount of ETH to deposit"
+disabled={isPending || isConfirming}
+aria-label="Amount in ETH"
+/>
       </div>
 
       <div className="info-box">
