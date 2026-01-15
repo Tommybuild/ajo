@@ -49,6 +49,7 @@ export const VALIDATION = {
   CRITICAL_ALERT_THRESHOLD: 15,
   MEDIUM_ALERT_THRESHOLD: 8,
   PERFORMANCE_REGRESSION_THRESHOLD: 1.2, // 20% increase
+  HIGH_MEMORY_THRESHOLD: 80, // percentage
   PERFORMANCE_TIME_RANGES: [
     { label: 'Last 1 hour', duration: 60 * 60 * 1000 },
     { label: 'Last 6 hours', duration: 6 * 60 * 60 * 1000 },
@@ -96,6 +97,16 @@ export const REGEX_PATTERNS = {
   PASSWORD_STRONG: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
   STORAGE_KEY: /^[a-zA-Z0-9._-]+$/,
   HEX_ADDRESS: /^0x[0-9a-fA-F]{0,64}$|^[0-9]*\.?[0-9]*$/
+};
+
+// Performance configuration constants
+export const PERFORMANCE_CONFIG = {
+  MAX_METRICS: 1000,
+  MAX_ALERTS: 100,
+  SLOW_OPERATION_THRESHOLD: 100, // ms
+  MEMORY_LEAK_THRESHOLD: 80, // percentage
+  NETWORK_TIMEOUT_THRESHOLD: 5000, // ms
+  BENCHMARK_SAMPLE_SIZE: 100
 };
 
 // Default values
