@@ -14,7 +14,7 @@ interface Transaction {
 }
 
 export function usePiggyBank() {
-  const { address, isConnected } = useAccount()
+  const { address } = useAccount()
   const { writeContract, data: hash, isPending } = useWriteContract()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const refetchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -152,18 +152,6 @@ export function usePiggyBank() {
   const withdrawAll = useCallback(() => {
     withdraw()
   }, [withdraw])
-
-  // Get contract statistics using the aggregated function
-  const { data: contractStats } = useReadContract({
-    address: PIGGYBANK_ADDRESS,
-    abi: PIGGYBANK_ABI,
-    functionName: 'getContractStats',
-    query: { enabled: !!address && address === owner },
-  })
-
-  // Extract individual values from contractStats tuple
-  const totalDeposits = contractStats && contractStats.length >= 3 ? contractStats[0] : undefined
-  const totalWithdrawals = contractStats && contractStats.length >= 3 ? contractStats[1] : undefined
 
   // Compute owner flag for convenience in components and tests
   const isOwner = useMemo(() => {
