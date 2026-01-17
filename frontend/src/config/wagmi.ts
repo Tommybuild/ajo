@@ -66,9 +66,13 @@ export const modal = createAppKit({
   }
 })
 
+// Export wagmi config for provider
+export const wagmiConfig = wagmiAdapter.wagmiConfig
+
 // Create QueryClient for React Query
 export const queryClient = new QueryClient()
 
 export function getInitialState(cookieValue: string | null) {
   return cookieToInitialState(wagmiAdapter.wagmiConfig, cookieValue)
 }
+
