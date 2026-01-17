@@ -6,6 +6,141 @@ import { BalanceCard } from '../components/BalanceCard'
 import * as usePiggyBankModule from '../hooks/usePiggyBank'
 import * as useTimelockModule from '../hooks/useTimelock'
 
+// Mock the hooks
+vi.mock('../hooks/usePiggyBank')
+vi.mock('../hooks/useTimelock')
+
+describe('Integration Tests', () => {
+  const mockUsePiggyBank = vi.spyOn(usePiggyBankModule, 'usePiggyBank')
+  const mockUseTimelock = vi.spyOn(useTimelockModule, 'useTimelock')
+  const mockDeposit = vi.fn()
+  const mockWithdraw = vi.fn()
+  const mockRefetchBalance = vi.fn()
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+
+    // Setup default mock values
+    mockUsePiggyBank.mockReturnValue({
+      balance: BigInt('1000000000000000000'), // 1 ETH
+      unlockTime: BigInt(Math.floor(Date.now() / 1000) + 3600), // 1 hour from now
+      isOwner: true,
+      ownerAddress: '0x1234567890123456789012345678901234567890',
+      deposit: mockDeposit,
+      withdraw: mockWithdraw,
+      isPending: false,
+      isConfirming: false,
+      isSuccess: false,
+      refetchBalance: mockRefetchBalance,
+      isConfirmed: false,
+      hash: undefined,
+    })
+
+    mockUseTimelock.mockReturnValue({
+      timeRemaining: {
+        days: 0,
+        hours: 1,
+        minutes: 0,
+        seconds: 0,
+      },
+      isUnlocked: false,
+    })
+  })
+
+  describe('Deposit and Withdraw Flow', () => {
+    it('should show locked state when funds are locked', () => {
+      render(<WithdrawButton />)
+
+      expect(screen.getByText('⏰')).toBeInTheDocument()
+      expect(screen.getByText('Your funds are currently locked. You can withdraw once the lock period expires.')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Withdraw All/i })).toBeDisabled()
+    })
+
+    it('should allow deposit when contract is not paused', () => {
+      render(<DepositForm />)
+
+      const input = screen.getByLabelText(/Amount \(ETH\)/i)
+      fireEvent.change(input, { target: { value: '0.5' } })
+
+      const button = screen.getByRole('button', { name: /Deposit ETH/i })
+      fireEvent.click(button)
+
+      expect(mockDeposit).toHaveBeenCalledWith('0.5')
+    })
+
+    it('should show balance correctly in BalanceCard', () => {
+      render(<BalanceCard />)
+
+      expect(screen.getByText(/1(\.\d+)?\s*ETH/)).toBeInTheDocument()
+      expect(screen.getByText('🔒')).toBeInTheDocument()
+      expect(screen.getByText(/Locked until:/)).toBeInTheDocument()
+    })
+  })
+
+  describe('State Transitions', () => {
+    it('should transition from locked to unlocked when time passes', () => {
+      // Initially locked
+      mockUseTimelock.mockReturnValue({
+        timeRemaining: {
+          days: 0,
+          hours: 1,
+          minutes: 0,
+          seconds: 0,
+        },
+        isUnlocked: false,
+      })
+
+      const { rerender } = render(<WithdrawButton />)
+
+      expect(screen.getByText('⏰')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Withdraw All/i })).toBeDisabled()
+
+      // Now unlocked
+      mockUseTimelock.mockReturnValue({
+        timeRemaining: null,
+        isUnlocked: true,
+      })
+
+      rerender(<WithdrawButton />)
+
+      expect(screen.getByText('✅')).toBeInTheDocument()
+      expect(screen.getByText('Your funds are unlocked! You can now withdraw your ETH.')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Withdraw All/i })).not.toBeDisabled()
+    })
+
+    it('should handle deposit success state transition', () => {
+      // Initially idle
+      mockUsePiggyBank.mockReturnValue({
+        balance: BigInt('1000000000000000000'),
+        unlockTime: undefined,
+        isOwner: false,
+        ownerAddress: undefined,
+        deposit: mockDeposit,
+        withdraw: vi.fn(),
+        isPending: false,
+        isConfirming: false,
+        isSuccess: false,
+        refetchBalance: mockRefetchBalance,
+        isConfirmed: false,
+        hash: undefined,
+      })
+
+      const { rerender } = render(<DepositForm />)
+
+      expect(screen.getByRole('button', { name: /Deposit ETH/i })).toBeInTheDocument()
+
+      // Transition to success
+      mockUsePiggyBank.mockReturnValue({
+        balance: BigInt('1000000000000000000'),
+        unlockTime: undefined,
+        isOwner: false,
+        ownerAddress: undefined,
+        deposit: mockDeposit,
+        withdraw: vi.fn(),
+        isPending: false,
+        isConfirming: false,
+        isSuccess: true,
+        refetchBalance: mockRefetchBalance,
         isConfirmed: false,
         hash: undefined,
       })
