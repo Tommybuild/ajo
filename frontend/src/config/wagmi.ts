@@ -12,8 +12,19 @@ import type { AppKitNetwork } from '@reown/appkit/networks'
 function getProjectId(): string {
   const projectId = import.meta.env.VITE_REOWN_PROJECT_ID
 
-  if (!projectId || typeof projectId !== 'string') {
-    throw new Error('VITE_REOWN_PROJECT_ID is not configured or invalid. Please set the environment variable to a valid string.')
+  if (!projectId) {
+    throw new Error(
+      'VITE_REOWN_PROJECT_ID is not configured. ' +
+      'This is required for REOWN AppKit wallet connections. ' +
+      'Get your Project ID from https://cloud.reown.com/ and add it to your .env file.'
+    )
+  }
+
+  if (typeof projectId !== 'string' || projectId.trim() === '') {
+    throw new Error(
+      'VITE_REOWN_PROJECT_ID is invalid. It must be a non-empty string. ' +
+      'Check your .env file configuration.'
+    )
   }
 
   return projectId
@@ -54,9 +65,6 @@ export const modal = createAppKit({
     '--w3m-accent': '#7c3aed', // Purple accent color
   }
 })
-
-// Export wagmi config for provider
-export const wagmiConfig = wagmiAdapter.wagmiConfig
 
 // Create QueryClient for React Query
 export const queryClient = new QueryClient()
