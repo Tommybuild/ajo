@@ -1,16 +1,19 @@
 import React, { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { WagmiProvider } from '@reown/appkit-adapter-wagmi'
+import { WagmiProvider } from 'wagmi' // cspell:ignore wagmi
+import { QueryClientProvider } from '@tanstack/react-query'
 import { App } from './App'
-import { wagmiClient } from './wagmiClient'
+import { wagmiConfig, queryClient } from './config/wagmi'
 
 const container = document.getElementById('root')!
 const root = createRoot(container)
 
 root.render(
   <StrictMode>
-    <WagmiProvider client={wagmiClient}>
-      <App /> 
-    </WagmiProvider>
+    <QueryClientProvider client={queryClient}>
+      <WagmiProvider config={wagmiConfig}>
+        <App />
+      </WagmiProvider>
+    </QueryClientProvider>
   </StrictMode>,
 )
