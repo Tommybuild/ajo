@@ -21,22 +21,22 @@ export function usePiggyBank() {
 
   // Memoize balance to prevent unnecessary re-renders
   const { data: balance, refetch: refetchBalance } = useReadContract({
-    abi: PIGGYBANK_ADDRESS,
-    address: PIGGYBANK_ABI,
+    address: PIGGYBANK_ADDRESS,
+    abi: PIGGYBANK_ABI,
     functionName: 'getBalance',
   })
 
   // Memoize unlock time
   const { data: unlockTime, refetch: refetchUnlockTime } = useReadContract({
-    abi: PIGGYBANK_ADDRESS,
-    address: PIGGYBANK_ABI,
+    address: PIGGYBANK_ADDRESS,
+    abi: PIGGYBANK_ABI,
     functionName: 'unlockTime',
   })
 
   // Memoize owner to prevent unnecessary re-renders
   const { data: owner } = useReadContract({
-    abi: PIGGYBANK_ADDRESS,
-    address: PIGGYBANK_ABI,
+    address: PIGGYBANK_ADDRESS,
+    abi: PIGGYBANK_ABI,
     functionName: 'owner',
   })
 
