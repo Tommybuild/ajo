@@ -198,3 +198,59 @@
   color: var(--text-secondary);
   margin-bottom: 0.5rem;
 }
+
+.balance-amount {
+  font-size: 3rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.timelock-info {
+  text-align: center;
+}
+
+.locked,
+.unlocked,
+.no-lock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.status-icon {
+  font-size: 2rem;
+}
+
+.countdown {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.time-unit {
+  background: var(--bg-card);
+  padding: 1rem;
+  border-radius: 12px;
+  min-width: 80px;
+  border: 1px solid var(--border);
+}
+
+.time-unit .value {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.time-unit .label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-top: 0.25rem;
+}
+
