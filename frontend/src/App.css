@@ -646,4 +646,137 @@
   }
 }
 
+/* Tablet devices (415px to 768px) */
+@media (min-width: 415px) and (max-width: 768px) {
+  .header-content {
+    flex-direction: row;
+    gap: 1.5rem;
+  }
 
+  .main-content {
+    padding: 1.5rem;
+  }
+
+  .connect-card {
+    padding: 2.5rem;
+  }
+
+  .connect-card h2 {
+    font-size: 2rem;
+  }
+
+  .features {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .balance-amount {
+    font-size: 2.25rem;
+  }
+
+  .countdown {
+    flex-wrap: wrap;
+  }
+
+  .time-unit {
+    min-width: 70px;
+    padding: 0.75rem;
+  }
+
+  .time-unit .value {
+    font-size: 1.5rem;
+  }
+
+  .tab-content {
+    padding: 1.5rem;
+  }
+
+  .app-nav {
+    padding: 1rem 1.5rem;
+    gap: 1rem;
+  }
+
+  .nav-btn {
+    padding: 0.75rem 1.25rem;
+  }
+}
+
+/* Desktop and tablet landscape (769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .header {
+    padding: 1rem 1.5rem;
+  }
+
+  .header-content {
+    gap: 1.5rem;
+  }
+
+  .main-content {
+    padding: 1.75rem;
+  }
+
+  .connect-card {
+    padding: 2.75rem;
+  }
+
+  .features {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .balance-amount {
+    font-size: 2.75rem;
+  }
+
+  .countdown {
+    gap: 1.25rem;
+  }
+
+  .time-unit {
+    min-width: 85px;
+    padding: 1.125rem;
+  }
+
+  .time-unit .value {
+    font-size: 1.875rem;
+  }
+
+  .app-nav {
+    padding: 1rem 1.5rem;
+  }
+}
+
+/* Large desktop (1025px and above) */
+@media (min-width: 1025px) {
+  .header {
+    padding: 1.25rem 2rem;
+  }
+
+  .header-content {
+    gap: 2rem;
+  }
+
+  .main-content {
+    padding: 2.5rem;
+  }
+
+  .connect-card {
+    padding: 3.5rem;
+  }
+
+  .features {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .balance-amount {
+    font-size: 3.25rem;
+  }
+
+  .time-unit {
+    min-width: 90px;
+    padding: 1.25rem;
+  }
+
+  .time-unit .value {
+    font-size: 2.125rem;
+  }
+}
