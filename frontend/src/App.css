@@ -254,3 +254,46 @@
   margin-top: 0.25rem;
 }
 
+/* Action Panel */
+.action-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  flex: 1;
+  padding: 1rem;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.tab.active {
+  color: var(--primary);
+  background: rgba(124, 58, 237, 0.1);
+  border-bottom: 2px solid var(--primary);
+}
+
+.tab:hover {
+  background: rgba(124, 58, 237, 0.05);
+}
+
+.tab-content {
+  padding: 2rem;
+}
+
+/* Forms */
+.deposit-form,
+.withdraw-section {
+  max-width: 500px;
+  margin: 0 auto;
+}
