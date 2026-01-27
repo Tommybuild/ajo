@@ -344,3 +344,36 @@
   align-items: center;
   gap: 0.75rem;
 }
+
+.info-box {
+  background: rgba(0, 82, 255, 0.1);
+  border: 1px solid rgba(0, 82, 255, 0.3);
+  color: var(--text-secondary);
+}
+
+.warning-box {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.success-box {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.warning-box .icon,
+.success-box .icon {
+  font-size: 1.5rem;
+}
+
+/* Buttons */
+.btn {
+  width: 100%;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  cursor: pointer;
+}
