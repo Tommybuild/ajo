@@ -10,12 +10,21 @@ import { NotificationProvider, NotificationContainer } from './components/Secure
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { useWalletHistory } from './hooks/useWalletHistory'
 import { usePiggyBank } from './hooks/usePiggyBank'
-import { useMobile, useTouchDevice } from './hooks/useMobile'
+import { useMobile } from './hooks/useMobile'
 import { DebugPage } from './components/DebugPage'
 import './App.css'
 import './styles/walletConnect.css'
 import './styles/saveForLater.css'
 import './styles/mobile.css'
+
+// Type declaration for custom web component
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'appkit-button': any
+    }
+  }
+}
 
 type Page = 'home' | 'wallet' | 'admin' | 'debug'
 
@@ -23,6 +32,7 @@ function App() {
   const { isConnected, address } = useAccount()
   const [currentPage, setCurrentPage] = useState<Page>('home')
   const { owner } = usePiggyBank()
+  const isMobile = useMobile()
 
   // Track wallet connection history
   useWalletHistory()
@@ -95,59 +105,71 @@ function App() {
           )}
 
         <main className="main-content">
-          {currentPage === 'wallet' ? (
-            <ErrorBoundary level="page">
-              <WalletConnectPage />
-            </ErrorBoundary>
-          ) : !isConnected ? (
-            <ErrorBoundary level="page">
-              <div className="connect-prompt">
-                <div className="connect-card">
-                  <h2>Welcome to Ajo PiggyBank</h2>
-                  <p>A decentralized savings application on Base blockchain</p>
-                  <div className="features">
-                    <ErrorBoundary level="component">
-                      <div className="feature">
-                        <span className="icon">🔒</span>
-                        <h3>Time-Locked Savings</h3>
-                        <p>Lock your ETH for a specific duration</p>
+          {(() => {
+            if (currentPage === 'wallet') {
+              return (
+                <ErrorBoundary level="page">
+                  <WalletConnectPage />
+                </ErrorBoundary>
+              );
+            } else if (!isConnected) {
+              return (
+                <ErrorBoundary level="page">
+                  <div className="connect-prompt">
+                    <div className="connect-card">
+                      <h2>Welcome to Ajo PiggyBank</h2>
+                      <p>A decentralized savings application on Base blockchain</p>
+                      <div className="features">
+                        <ErrorBoundary level="component">
+                          <div className="feature">
+                            <span className="icon">🔒</span>
+                            <h3>Time-Locked Savings</h3>
+                            <p>Lock your ETH for a specific duration</p>
+                          </div>
+                        </ErrorBoundary>
+                        <ErrorBoundary level="component">
+                          <div className="feature">
+                            <span className="icon">💰</span>
+                            <h3>Secure Storage</h3>
+                            <p>Your funds are safe on-chain</p>
+                          </div>
+                        </ErrorBoundary>
+                        <ErrorBoundary level="component">
+                          <div className="feature">
+                            <span className="icon">⚡</span>
+                            <h3>Base Network</h3>
+                            <p>Fast and low-cost transactions</p>
+                          </div>
+                        </ErrorBoundary>
                       </div>
-                    </ErrorBoundary>
-                    <ErrorBoundary level="component">
-                      <div className="feature">
-                        <span className="icon">💰</span>
-                        <h3>Secure Storage</h3>
-                        <p>Your funds are safe on-chain</p>
+                      <div className="connect-action">
+                        <p>Connect your wallet to get started</p>
+                        <appkit-button />
                       </div>
-                    </ErrorBoundary>
-                    <ErrorBoundary level="component">
-                      <div className="feature">
-                        <span className="icon">⚡</span>
-                        <h3>Base Network</h3>
-                        <p>Fast and low-cost transactions</p>
-                      </div>
-                    </ErrorBoundary>
+                    </div>
                   </div>
-                  <div className="connect-action">
-                    <p>Connect your wallet to get started</p>
-                    <appkit-button />
-                  </div>
-                </div>
-              </div>
-            </ErrorBoundary>
-          ) : currentPage === 'admin' ? (
-            <ErrorBoundary level="page">
-              <AdminDashboard />
-            </ErrorBoundary>
-          ) : currentPage === 'debug' ? (
-            <ErrorBoundary level="page">
-              <DebugPage />
-            </ErrorBoundary>
-          ) : (
-            <ErrorBoundary level="page">
-              <PiggyBankDashboard />
-            </ErrorBoundary>
-          )}
+                </ErrorBoundary>
+              );
+            } else if (currentPage === 'admin') {
+              return (
+                <ErrorBoundary level="page">
+                  <AdminDashboard />
+                </ErrorBoundary>
+              );
+            } else if (currentPage === 'debug') {
+              return (
+                <ErrorBoundary level="page">
+                  <DebugPage />
+                </ErrorBoundary>
+              );
+            } else {
+              return (
+                <ErrorBoundary level="page">
+                  <PiggyBankDashboard />
+                </ErrorBoundary>
+              );
+            }
+          })()}
         </main>
 
         <footer className="footer">
